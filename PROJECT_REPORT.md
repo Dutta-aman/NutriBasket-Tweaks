@@ -1,6 +1,6 @@
 # NutriBasket — Final Year Project Report (Working Draft)
 
-> This is the working draft of the group project report. Group/college-specific fields are marked with `[PLACEHOLDER]` and must be filled before submission. Figures referenced from `PROJECT_DIAGRAM.md` render natively on GitHub; screenshots marked `[INSERT SCREENSHOT]` must be captured from the live app.
+> This is the working draft of the group project report. Group/college-specific fields are marked with `[PLACEHOLDER]` and must be filled before submission. All figures are embedded directly in this report — mermaid diagrams render natively on GitHub and can be exported as images (e.g. via mermaid.live) for the Word hardcopy; no external documents are needed. Screenshots marked `[INSERT SCREENSHOT]` must be captured from the live app.
 >
 > **Suggested Word formatting (per standard B.Tech guidelines):** Times New Roman 12 pt body, 1.5 line spacing, 1-inch margins, justified text; chapter titles 16 pt bold; figure captions below figures, table captions above tables; page numbers bottom center (Roman numerals for front matter, Arabic from Chapter 1); IEEE numbered citations in square brackets.
 
@@ -85,11 +85,11 @@ The project was verified end-to-end against live barcodes: a real product return
 | Figure | Title | Source |
 | --- | --- | --- |
 | Fig. 1.1 | NutriBasket banner | `assets/banner.svg` |
-| Fig. 4.1 | System architecture (frontend, backend, OFF, deployments) | PROJECT_DIAGRAM.md §1 |
-| Fig. 4.2 | Frontend component tree | PROJECT_DIAGRAM.md §2 |
-| Fig. 4.3 | User workflow with fallback paths | PROJECT_DIAGRAM.md §3 |
-| Fig. 4.4 | Backend API sequence diagram | PROJECT_DIAGRAM.md §4 |
-| Fig. 4.5 | Deployment lifecycle | PROJECT_DIAGRAM.md §5 |
+| Fig. 4.1 | System architecture (frontend, backend, OFF, deployments) | §4.1 (embedded) |
+| Fig. 4.2 | Frontend component tree | §4.2 (embedded) |
+| Fig. 4.3 | User workflow with fallback paths | §4.2 (embedded) |
+| Fig. 4.4 | Backend API sequence diagram | §4.3 (embedded) |
+| Fig. 4.5 | Deployment lifecycle | §4.5 (embedded) |
 | Fig. 5.1 | [INSERT SCREENSHOT] Scan screen with camera frame and manual entry form | — |
 | Fig. 5.2 | [INSERT SCREENSHOT] Product detail with nutrition grid and price entry | — |
 | Fig. 5.3 | [INSERT SCREENSHOT] Basket with nutrition totals | — |
@@ -233,7 +233,44 @@ The review shows that while scanning libraries and nutrition datasets each exist
 
 ## 4.1 Overall Architecture
 
-The system follows a classic three-tier web architecture: a browser frontend (Vercel), an Express backend (Render), and the external Open Food Facts API. The backend is the only component that talks to Open Food Facts. CORS is scoped to the frontend origin via the `CLIENT_ORIGIN` environment variable, and a 24-hour in-memory cache absorbs repeated lookups. See **Fig. 4.1** (PROJECT_DIAGRAM.md §1).
+The system follows a classic three-tier web architecture: a browser frontend (Vercel), an Express backend (Render), and the external Open Food Facts API. The backend is the only component that talks to Open Food Facts. CORS is scoped to the frontend origin via the `CLIENT_ORIGIN` environment variable, and a 24-hour in-memory cache absorbs repeated lookups. The overall architecture is shown in **Fig. 4.1**.
+
+**Fig. 4.1 — System architecture (frontend, backend, Open Food Facts, deployment pipelines).**
+
+```mermaid
+graph TD
+    subgraph FRONT["Frontend (Vercel)"]
+        B["Browser / React 19 + Vite app<br/>src/App.jsx"]
+        F["fetchProductByBarcode()<br/>base = VITE_API_URL or empty string"]
+    end
+
+    subgraph BACKEND["Backend (Render)"]
+        API["Express server<br/>server/index.js"]
+        CACHE["24h in-memory cache<br/>server/lib/cache.js"]
+        CORS["CORS allowlist<br/>CLIENT_ORIGIN env"]
+    end
+
+    OFF["Open Food Facts API<br/>world.openfoodfacts.org<br/>api/v2/product"]
+
+    subgraph DEPLOY["Deployment pipelines"]
+        GH["GitHub push<br/>branches: main, tweaks"]
+        ACT["GitHub Action<br/>render-deploy.yml"]
+        RAPI["Render Deploy API<br/>api.render.com/v1/services"]
+        VDEP["Vercel auto-deploy<br/>vercel.json (framework vite)"]
+    end
+
+    B --> F
+    F -- "GET /api/products/:barcode" --> API
+    API -- "cache lookup / store" --> CACHE
+    API --> CORS
+    API -- "v2 lookup, 10s timeout,<br/>503 retry + backoff" --> OFF
+
+    GH --> ACT
+    ACT -- "commitId + RENDER_API_KEY" --> RAPI
+    RAPI --> API
+    GH --> VDEP
+    VDEP --> B
+```
 
 ## 4.2 Frontend Design
 
@@ -241,11 +278,62 @@ The system follows a classic three-tier web architecture: a browser frontend (Ve
 - **Scanner:** `BarcodeScanner.jsx` uses ZXing's `BrowserMultiFormatReader` with a status machine (idle/starting/scanning/denied/no-camera/busy/error), 1.5 s duplicate-scan dedupe, and StrictMode-safe stream cleanup. Camera starts only on user tap (iOS autoplay quirk).
 - **Price entry:** `ProductInfo.jsx` validates input with `/^\d+(\.\d{1,2})?$/` (plain positive amount, ≤ 2 decimals) before enabling "Add to Basket", preventing NaN from reaching totals.
 - **Resilience:** a top-level `ErrorBoundary` shows a restart screen instead of a white page; a 5-second timer surfaces a cold-start hint during lookups.
-- See **Fig. 4.2** and **Fig. 4.3** (PROJECT_DIAGRAM.md §2–§3).
+- The frontend component tree is shown in **Fig. 4.2** and the full user workflow (happy path and fallbacks) in **Fig. 4.3**.
+
+**Fig. 4.2 — Frontend component tree.**
+
+```mermaid
+graph TD
+    MAIN["main.jsx<br/>ReactDOM.createRoot + StrictMode"] --> EB["ErrorBoundary<br/>render crash -> restart screen"]
+    EB --> APP["App<br/>page: welcome / home / scan / product / basket / checkout / success<br/>lookup: loading / not-found / error / ready<br/>state: basket, prices, selectedProduct, lastBarcode"]
+
+    APP --> W["Welcome"]
+    APP --> H["Home"]
+    APP --> S["ScanProduct"]
+    APP --> P["ProductInfo"]
+    APP --> B["Basket"]
+    APP --> C["Checkout"]
+    APP --> PS["PaymentSuccess"]
+
+    W --> L["AppLayout<br/>shared card shell"]
+    S --> SC["BarcodeScanner<br/>ZXing BrowserMultiFormatReader"]
+    S --> BAR["lib/barcode.js<br/>gtinCheckDigitValid"]
+    P --> API["lib/api.js<br/>fetchProductByBarcode"]
+    API --> DATA["data/products.js<br/>legacy, unused"]
+    W --> STY["styles/global.css, basket.css,<br/>checkout.css, payment.css"]
+```
+
+**Fig. 4.3 — User workflow with fallback paths.**
+
+```mermaid
+flowchart LR
+    W["Welcome"] --> H["Home"]
+    H --> SC["Scan screen"]
+    SC --> CAM["Camera scan via ZXing"]
+    SC --> MAN["Manual barcode entry<br/>GTIN check-digit validation"]
+    CAM -- "denied / no-camera / busy / error" --> MAN
+
+    CAM --> LK["App lookup: loading"]
+    MAN --> LK
+    LK -- "after 5s" --> HINT["Cold-start hint:<br/>server wake-up can take ~40s"]
+    HINT --> LK
+
+    LK -- "ready" --> RD["ProductInfo<br/>nutrition card + price entry"]
+    LK -- "not-found" --> NF["Product Not Found"] --> SC
+    LK -- "error" --> ER["Something Went Wrong"]
+    ER -- "Retry (last barcode)" --> LK
+
+    RD --> PR["Enter price<br/>regex validated: digits, up to 2 decimals"]
+    PR --> AD["Add to Basket<br/>dedupe by id, quantity +1"]
+    AD --> BK["Basket<br/>total amount + nutrition summary"]
+    BK --> CO["Checkout<br/>UPI QR placeholder"]
+    CO --> OK["Payment Success<br/>generated NB transaction id"]
+    OK --> H
+```
 
 ## 4.3 Backend Design
 
-Endpoints (see **Table 4.1** and **Fig. 4.4**, PROJECT_DIAGRAM.md §4):
+The endpoints are listed in **Table 4.1**, and the full request lifecycle is shown in **Fig. 4.4**.
 
 | Method | Path | Behavior |
 | --- | --- | --- |
@@ -253,17 +341,89 @@ Endpoints (see **Table 4.1** and **Fig. 4.4**, PROJECT_DIAGRAM.md §4):
 | GET | `/health` | `{ "status": "ok" }` — used by Render's health check |
 | GET | `/api/products/:barcode` | Validates GTIN (8–14 digits, check digit); cache lookup; Open Food Facts fetch via `fetchWithRetry` (10 s timeout, 503 retry with 800 ms backoff, 2 attempts); `normalizeProduct` maps the v2 response (`_100g` → `_serving` → plain fallbacks, NaN-proof zero defaults); shell-product guard on `product_name`. Returns `400 invalid_barcode`, `404 product_not_found`, `502 upstream_error`, or `200` normalized product `{ id, barcode, name, brand, image_url, pack_quantity, price_inr, calories, protein, carbs, fat }` |
 
+**Fig. 4.4 — Backend API sequence diagram.**
+
+```mermaid
+sequenceDiagram
+    participant C as Client (browser)
+    participant E as Express route (index.js)
+    participant O as off.js lookup
+    participant F as Open Food Facts
+    participant K as 24h cache
+
+    C->>E: GET /api/products/:barcode
+    alt Invalid check digit
+        E-->>C: 400 error: invalid_barcode
+    else Valid barcode
+        E->>O: getProductByBarcode(barcode)
+        O->>K: get(barcode)
+        alt Cache hit (under 24h TTL)
+            K-->>O: cached product
+            O-->>E: product
+            E-->>C: 200 product JSON
+        else Cache miss
+            O->>F: GET /api/v2/product/{code}.json (10s timeout)
+            alt 503 from OFF
+                F-->>O: 503 - retry with 800ms backoff
+                O->>F: second attempt
+            end
+            alt Product found with product_name
+                F-->>O: OFF JSON
+                O->>O: normalizeProduct()
+                O->>K: set(barcode, product, 24h TTL)
+                O-->>E: product
+                E-->>C: 200 normalized product
+            else Missing product_name
+                F-->>O: 404 / empty payload
+                O-->>E: null
+                E-->>C: 404 error: product_not_found
+            end
+        end
+        alt Upstream failure after retries
+            O-->>E: throw (timeout / non-2xx)
+            E-->>C: 502 error: upstream_error
+        end
+    end
+```
+
 ## 4.4 Data Flow
 
 Scan or manual entry → GTIN validation (client) → `GET /api/products/:barcode` → GTIN validation (server) → 24 h cache → Open Food Facts → normalize → 200 response → product screen → price input → basket with totals → checkout → receipt. Not-found and error paths route back to the scan screen with retry.
 
 ## 4.5 Deployment Design
 
-Two independent pipelines (see **Fig. 4.5**, PROJECT_DIAGRAM.md §5):
+Two independent pipelines (see **Fig. 4.5**):
 
 - **Backend:** push to `main`/`tweaks` → GitHub Actions workflow (`render-deploy.yml`) guards on the `RENDER_SERVICE_ID` repo variable, then POSTs to the Render Deploy API with `RENDER_API_KEY` and `commitId` → Render builds and deploys; `/health` is the health check. A canonical alternative: connecting the repo in the Render dashboard registers a native webhook (no secrets).
 - **Frontend:** Vercel auto-builds on push with `VITE_API_URL` baked in at build time.
-- Self-hosting: Render blueprint (`render.yaml`) + Vercel import — documented in README §"Deploy your own instance".
+- Self-hosting: deploy the backend manually from the Render dashboard using the `render.yaml` blueprint (set `CLIENT_ORIGIN`; optionally `OFF_BASE_URL`), then import the frontend repository into Vercel with `VITE_API_URL` set to the new backend URL. Full steps are in the repository README.
+
+**Fig. 4.5 — Deployment lifecycle.**
+
+```mermaid
+flowchart TD
+    subgraph CANON["Canonical path (upstream repo)"]
+        P1["Push to main"] --> WH["Render dashboard webhook"] --> R1["Render deploy"] --> LIVE
+    end
+
+    subgraph ACTPATH["Action path (this repo)"]
+        P2["Push to main / tweaks"] --> GA["GitHub Action<br/>render-deploy.yml"]
+        GA --> G{"RENDER_SERVICE_ID<br/>repo variable set?"}
+        G -- "no" --> FAIL["Exit 1 with setup error message"]
+        G -- "yes" --> CURL["curl -X POST Render Deploy API<br/>Authorization: Bearer RENDER_API_KEY<br/>body: commitId = github.sha, clearCache"]
+        CURL --> R2["Render deploy at commitId<br/>rootDir: server, plan: free"]
+        R2 --> LIVE["Live API service<br/>GET /health -> status ok"]
+    end
+
+    subgraph VDP["Frontend path (Vercel)"]
+        P3["Push to GitHub"] --> V["Vercel build<br/>VITE_API_URL baked in"]
+        V --> VURL["Frontend URL<br/>https://nutri-basket-six.vercel.app"]
+    end
+
+    subgraph SELF["Manual / self-hosting"]
+        B1["Render dashboard + render.yaml blueprint"] --> B2["Manual deploy<br/>set CLIENT_ORIGIN, OFF_BASE_URL"]
+    end
+```
 
 ---
 
