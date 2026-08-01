@@ -53,7 +53,7 @@ The app runs on branch `tweaks`. History: 11 original commits (upstream UI work 
 | Property | Value |
 | --- | --- |
 | Frontend host | Vercel (project `nutri-basket`, `vercel.json` with `{"framework":"vite"}`) |
-| Backend host | Render (service `nutribasket-api`, free plan, region Oregon, branch `tweaks`, rootDir `server`, auto-deploy on commit, health check `/health`) |
+| Backend host | Render (service `nutribasket-api`, free plan, region Oregon, branch `tweaks`, rootDir `server`, auto-deploy via GitHub Action on commit, health check `/health`) |
 | Environment | `VITE_API_URL` set as Vercel production env var; `CLIENT_ORIGIN` set as Render env var |
 
 ---
@@ -218,8 +218,11 @@ Verified live: Nutella (barcode `3017624010701`) returns normalized nutrition da
 
 ```
 NutriBasket/
-├── .env.example                    # VITE_API_URL documented (untracked)
+├── .env.example                    # VITE_API_URL documented
 ├── .gitignore                      # node_modules, dist, .env*, .vercel, editors
+├── .github/
+│   └── workflows/
+│       └── render-deploy.yml       # GitHub Action → Render API auto-deploy
 ├── .oxlintrc.json                  # remote $schema + react/oxc plugins
 ├── IMPROVEMENT.md                  # improvement plan (barcode & QR scanner integration)
 ├── README.md                       # this file
