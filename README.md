@@ -84,12 +84,42 @@ Two tracks plus self-service:
 - **PRs themselves never deploy** — only merges (pushes) do.
 - **Webhook vs Action:** pick one per repo. Connecting the repo in the Render dashboard registers the webhook (native auto-deploy, no secrets needed). The Action route is for CLI-created services: set `RENDER_API_KEY` (Render account → API Keys → long-lived key) and `RENDER_SERVICE_ID` (the `srv-...` id) under Settings → Secrets and variables → Actions. If both are configured the repo deploys twice per push (harmless); if the Action is unconfigured it fails loudly and the webhook still deploys.
 
-**Deploy your own instance (anyone using the project):**
+**Deploy your own instance (anyone using the project — including team members):**
 
-1. Create a free Render account.
-2. Render dashboard → New → Blueprint → connect your repo fork (the committed `render.yaml` defines everything: `rootDir: server`, Node runtime, free plan, build `npm install`, start `npm start`, health check `/health`). Set the `CLIENT_ORIGIN` env var to your frontend URL. Connecting via the dashboard registers the webhook, so every push to `main` auto-deploys.
-3. For the frontend: create a Vercel project from the repo (framework Vite) and set the `VITE_API_URL` env var to your Render service URL.
-4. If you created the Render service via CLI instead of the dashboard, configure the two Actions settings described above.
+The app has two parts that must both be deployed and connected:
+
+- **Backend** (the Node/Express API that talks to Open Food Facts) → **Render**
+- **Frontend** (the React app users open in their browser) → **Vercel**
+
+They are connected by **one environment variable**: the frontend needs to know the backend's URL (`VITE_API_URL`), and the backend needs to know the frontend's URL for CORS (`CLIENT_ORIGIN`). Both are just text values you paste into the platforms' settings — no code changes needed.
+
+**Step 1 — Backend on Render (5 minutes):**
+
+1. Create a free account at https://render.com (the free "Hobby" plan is enough).
+2. Click **New → Blueprint** (not "Web Service"). Blueprint reads the committed `render.yaml`, which already configures everything: `rootDir: server`, Node runtime, free plan, build command `npm install`, start command `npm start`, and health check at `/health`. You only pick the repository and branch (`main`).
+3. Connecting via the dashboard registers the GitHub webhook automatically → **every push/merge to `main` auto-deploys** the backend. You do not need any API key or secrets for this path.
+4. Add the **`CLIENT_ORIGIN`** environment variable: Render → your service → **Environment** tab → add `CLIENT_ORIGIN` = your frontend URL from Step 2 (e.g. `https://my-nutribasket.vercel.app`). This is the only address allowed to call your backend (CORS). The service auto-redeploys when you save it.
+5. When the deploy finishes, **find your backend URL** on the service page (top of the page, format `https://<service-name>.onrender.com`). Save this — it's the value for `VITE_API_URL` in Step 2. Verify it works: open `<your-url>/health` in a browser → you should see `{"status":"ok"}`.
+
+**Step 2 — Frontend on Vercel (5 minutes):**
+
+1. Create a free account at https://vercel.com and import the same repository (framework will auto-detect **Vite**; leave build/output settings at their defaults).
+2. Go to project → **Settings → Environment Variables** and add:
+   - **`VITE_API_URL`** = your backend URL from Step 1 (e.g. `https://my-nutribasket-api.onrender.com`) — **no trailing slash**, because the code appends `/api/products/...` to it.
+   - It is read at **build time** (`src/lib/api.js`), so after adding or changing it you must trigger a **Redeploy** (Deployments → ⋯ → Redeploy).
+3. If you skip `VITE_API_URL`, the app falls back to same-origin `/api/...` calls — that works in local dev (Vite proxies `/api` to `localhost:3001`) but **fails in production** (Vercel doesn't serve `/api`). Always set it.
+
+**Step 3 — Verify the whole flow:**
+
+1. Open your Vercel URL in a phone or browser.
+2. Go to the **Scan** screen and either scan a product barcode or enter one manually — try `3017624010701` (Nutella) for a known-good test.
+3. You should see the product card with nutrition data, enter a price, and add it to the basket. Scanning `8901234567890` (unknown) should show the "not found" screen.
+
+**What you get for free:**
+
+- Push to `main` → backend redeploys (webhook) and frontend redeploys (Vercel) automatically.
+- The backend URL is stable; the free tier sleeps after ~15 minutes of inactivity, so the first request after an idle period may take ~40 seconds (cold start).
+- If you ever create the Render service via CLI instead of the dashboard, see the "Webhook vs Action" note above — the repo also ships a GitHub Action (`.github/workflows/render-deploy.yml`) that deploys via the Render API when you configure the `RENDER_API_KEY` secret and `RENDER_SERVICE_ID` variable.
 
 ---
 
