@@ -67,7 +67,8 @@ The app runs on branch `tweaks`. History: 11 original commits (upstream UI work 
 
 - The frontend reads `VITE_API_URL` at build time; in production it is set to `https://nutribasket-api.onrender.com`, so all `/api/products/:barcode` calls go to Render.
 - The backend runs on the Render **free tier**, which spins down after ~15 minutes of inactivity. **The first request after an idle period can take ~40 seconds** (cold start); subsequent requests are fast.
-- The Render Blueprint (`render.yaml`) defines the service; a manual Render service is also wired to the `tweaks` branch with auto-deploy on commit and a `/health` health check.
+- The Render Blueprint (`render.yaml`) defines the service; a manual Render service is also wired to the `tweaks` branch with auto-deploy configured on commit and a `/health` health check. Note: pushes have so far **not** triggered auto-deploys (the GitHub webhook does not fire), so deploys are triggered manually via the Render CLI (`render deploys create srv-d9mu74bl550s738vnipg`) until the webhook is re-registered.
+- Browsing the API root (`https://nutribasket-api.onrender.com/`) returns service info JSON — `GET /`, `/health`, and `/api/products/:barcode` all respond 200.
 
 ---
 
@@ -125,6 +126,7 @@ The following quick fixes were applied:
 New `server/` — its own npm project (`"type": "module"`, `engines.node >= 18`):
 
 - **`server/index.js`** — Express app with `helmet()` and `cors({ origin: CLIENT_ORIGIN || "*" })`, listening on `PORT || 3001`. Endpoints:
+  - `GET /` → `{ service: "NutriBasket API", endpoints: [...] }`
   - `GET /health` → `{ status: "ok" }`
   - `GET /api/products/:barcode` → validates the barcode with `gtinCheckDigitValid` (regex `^\d{8,14}$`, allowed lengths 8/12/13/14, alternating 3/1 weights from the right) → `400 invalid_barcode` on failure; `404 product_not_found` when the lookup returns nothing; `502 upstream_error` when the Open Food Facts upstream fails
 - **`server/lib/off.js`** — `fetchWithRetry` (10-second `AbortController` timeout, `User-Agent: NutriBasket/1.0 (contact@nutribasket.app)`, `Accept: application/json`, retry on 503 with 800 ms backoff, 2 attempts total); `normalizeProduct` maps the Open Food Facts v2 response (requested fields: `code, product_name, brands, image_front_url, image_url, quantity, nutriments`) into `{ id, barcode, name, brand, image_url, pack_quantity, price_inr: null, calories, protein, carbs, fat }` with `_100g` → `_serving` → plain fallbacks and zero defaults (NaN-proof). A "shell product" guard requires `product_name` (Open Food Facts returns `status: 1` for unknown codes), otherwise the lookup is treated as a 404
@@ -208,7 +210,7 @@ NutriBasket/
 │       └── payment.css             # emerald-ized
 └── server/                         # Express backend (committed with b209376)
     ├── .env.example
-    ├── index.js                    # /health, /api/products/:barcode
+    ├── index.js                    # GET /, /health, /api/products/:barcode
     ├── lib/
     │   ├── cache.js                # in-memory Map, 24h TTL
     │   └── off.js                  # Open Food Facts client + normalization
