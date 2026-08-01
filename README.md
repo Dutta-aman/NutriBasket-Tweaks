@@ -67,7 +67,7 @@ The app runs on branch `tweaks`. History: 11 original commits (upstream UI work 
 
 - The frontend reads `VITE_API_URL` at build time; in production it is set to `https://nutribasket-api.onrender.com`, so all `/api/products/:barcode` calls go to Render.
 - The backend runs on the Render **free tier**, which spins down after ~15 minutes of inactivity. **The first request after an idle period can take ~40 seconds** (cold start); subsequent requests are fast.
-- The Render Blueprint (`render.yaml`) defines the service; a manual Render service is also wired to the `tweaks` branch with auto-deploy configured on commit and a `/health` health check. Note: pushes have so far **not** triggered auto-deploys (the GitHub webhook does not fire), so deploys are triggered manually via the Render CLI (`render deploys create srv-d9mu74bl550s738vnipg`) until the webhook is re-registered.
+- The Render Blueprint (`render.yaml`) defines the service; a manual Render service is also wired to the `tweaks` branch with auto-deploy configured on commit and a `/health` health check. Render's GitHub webhook is not registered on the repo (the service was created via CLI), so auto-deploys are driven by a GitHub Action (`.github/workflows/render-deploy.yml`) that calls the Render API trigger endpoint on every push to `tweaks`, using a Render API key stored as the `RENDER_API_KEY` repo secret. The key is a short-lived CLI session token — replace it with a long-lived API key from Render dashboard (Account → API Keys) when it expires.
 - Browsing the API root (`https://nutribasket-api.onrender.com/`) returns service info JSON — `GET /`, `/health`, and `/api/products/:barcode` all respond 200.
 
 ---
