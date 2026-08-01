@@ -11,13 +11,15 @@ function ProductInfo({
 
   const [priceInput, setPriceInput] = useState("");
 
+  const priceInputValid = /^\d+(\.\d{1,2})?$/.test(priceInput.trim());
+
   function handleAdd() {
 
     if (price === null) {
 
-      if (!priceInput.trim()) return;
+      if (!priceInputValid) return;
 
-      onSetPrice(product.id, Number(priceInput));
+      onSetPrice(product.id, Number(priceInput.trim()));
 
     }
 
@@ -175,7 +177,7 @@ function ProductInfo({
 
             onClick={handleAdd}
 
-            disabled={price === null && !priceInput.trim()}
+            disabled={price === null && !priceInputValid}
 
           >
 
