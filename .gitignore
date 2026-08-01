@@ -24,6 +24,9 @@ dist-ssr
 *API*.txt
 *key*.txt
 
+# Generated diagram images (report figures)
+assets/figures/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
