@@ -4,7 +4,7 @@
     justify-content:center;
     align-items:center;
     padding:40px;
-    background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+    background:radial-gradient(circle at top,#065F46,#022C22 65%);
 }
 
 .success-card{
@@ -28,8 +28,8 @@
     justify-content:center;
     align-items:center;
     font-size:60px;
-    background:#22c55e;
-    box-shadow:0 0 25px rgba(34,197,94,.5);
+    background:var(--primary);
+    box-shadow:0 0 25px rgba(16,185,129,.5);
 }
 
 .success-card h1{
@@ -63,7 +63,7 @@
 }
 
 .label{
-    color:#cbd5e1;
+    color:var(--text-muted);
     font-size:16px;
 }
 
@@ -78,7 +78,7 @@
     padding:18px;
     border:none;
     border-radius:16px;
-    background:#22c55e;
+    background:var(--primary);
     color:white;
     font-size:20px;
     font-weight:700;
@@ -87,7 +87,7 @@
 }
 
 .success-btn:hover{
-    background:#16a34a;
+    background:var(--primary-dark);
     transform:translateY(-2px);
 }
 

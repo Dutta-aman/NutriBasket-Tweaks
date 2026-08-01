@@ -4,7 +4,7 @@
     justify-content:center;
     align-items:center;
     padding:40px;
-    background:linear-gradient(135deg,#0f172a,#1e293b,#2563eb);
+    background:radial-gradient(circle at top,#065F46,#022C22 65%);
 }
 
 .basket-card{
@@ -102,7 +102,7 @@
     font-size:22px;
     font-weight:bold;
     background:white;
-    color:#2563eb;
+    color:var(--primary);
     transition:.25s;
 }
 
@@ -189,18 +189,18 @@
 }
 
 .start-btn{
-    background:#22c55e;
+    background:var(--primary);
     color:white;
 }
 
 .start-btn:hover{
     transform:translateY(-2px);
-    background:#16a34a;
+    background:var(--primary-dark);
 }
 
 .secondary-btn{
     background:white;
-    color:#2563eb;
+    color:var(--primary);
 }
 
 .secondary-btn:hover{
