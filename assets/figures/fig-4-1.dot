@@ -1,0 +1,43 @@
+digraph architecture {
+  rankdir=TB;
+  nodesep=0.45; ranksep=0.55;
+  graph [fontname="Arial", fontsize=14, bgcolor="white"];
+  node  [fontname="Arial", fontsize=13, shape=box, style="rounded,filled",
+         color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A", penwidth=1.5, margin="0.18,0.09"];
+  edge  [fontname="Arial", fontsize=12, color="#555555", arrowsize=0.9];
+
+  subgraph cluster_frontend {
+    label="Frontend (Vercel)"; style="rounded"; color="#60A5FA"; fontcolor="#1E3A8A"; fontsize=14;
+    browser [label=<Browser / React 19 + Vite app<br/>src/App.jsx>];
+    fetch   [label=<fetchProductByBarcode()<br/>base = VITE_API_URL or empty string>];
+  }
+
+  subgraph cluster_backend {
+    label="Backend (Render)"; style="rounded"; color="#34D399"; fontcolor="#064E3B"; fontsize=14;
+    api   [label=<Express server<br/>server/index.js>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+    cache [label=<24h in-memory cache<br/>server/lib/cache.js>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+    cors  [label=<CORS allowlist<br/>CLIENT_ORIGIN env>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  }
+
+  off [label=<Open Food Facts API<br/>world.openfoodfacts.org<br/>api/v2/product>,
+       color="#6B7280", fillcolor="#F3F4F6", fontcolor="#374151"];
+
+  subgraph cluster_deploy {
+    label="Deployment pipelines"; style="rounded"; color="#FBBF24"; fontcolor="#78350F"; fontsize=14;
+    gh     [label=<GitHub push<br/>branches: main, tweaks>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+    ga     [label=<GitHub Action<br/>render-deploy.yml>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+    rapi   [label=<Render Deploy API<br/>api.render.com/v1/services>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+    vercel [label=<Vercel auto-deploy<br/>vercel.json (framework vite)>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+  }
+
+  browser -> fetch;
+  fetch -> api [label="GET /api/products/:barcode"];
+  api -> cache [label="cache lookup / store", dir=both];
+  api -> cors [style=dashed];
+  api -> off [label="v2 lookup, 10s timeout, 503 retry + backoff"];
+  gh -> ga;
+  ga -> rapi [label="commitId + RENDER_API_KEY"];
+  rapi -> api;
+  gh -> vercel;
+  vercel -> browser;
+}

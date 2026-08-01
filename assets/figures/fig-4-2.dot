@@ -1,0 +1,39 @@
+digraph component_tree {
+  rankdir=TB;
+  nodesep=0.35; ranksep=0.55;
+  graph [fontname="Arial", fontsize=14, bgcolor="white"];
+  node  [fontname="Arial", fontsize=13, shape=box, style="rounded,filled",
+         color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A", penwidth=1.5, margin="0.16,0.08"];
+  edge  [fontname="Arial", fontsize=12, color="#555555", arrowsize=0.9];
+
+  main [label=<main.jsx<br/>ReactDOM.createRoot + StrictMode>,
+        color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+  eb   [label=<ErrorBoundary<br/>render crash shows restart screen>,
+        color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+  app  [label=<App - screen state machine<br/>pages: welcome / home / scan / product / basket / checkout / success<br/>lookup: loading / not-found / error / ready<br/>state: basket, prices, selectedProduct, lastBarcode>];
+
+  welcome [label="Welcome"];
+  home    [label="Home"];
+  scan    [label="ScanProduct"];
+  product [label="ProductInfo"];
+  basket  [label="Basket"];
+  checkout [label="Checkout"];
+  success [label="PaymentSuccess"];
+
+  layout  [label=<AppLayout<br/>shared card shell>, color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+  scanner [label=<BarcodeScanner<br/>ZXing BrowserMultiFormatReader>];
+  barcode [label=<lib/barcode.js<br/>gtinCheckDigitValid>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  api     [label=<lib/api.js<br/>fetchProductByBarcode>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  legacy  [label=<data/products.js<br/>legacy, unused>, color="#6B7280", fillcolor="#F3F4F6", fontcolor="#374151"];
+  styles  [label=<styles<br/>global.css, basket.css,<br/>checkout.css, payment.css>, color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+
+  main -> eb;
+  eb -> app;
+  app -> {welcome home scan product basket checkout success};
+  welcome -> layout;
+  scan -> scanner;
+  scan -> barcode;
+  product -> api;
+  api -> legacy [style=dashed, label="legacy, unused"];
+  layout -> styles [style=dashed, color="#9CA3AF"];
+}

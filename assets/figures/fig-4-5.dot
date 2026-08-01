@@ -1,0 +1,55 @@
+digraph deployment {
+  rankdir=TB;
+  nodesep=0.5; ranksep=0.45;
+  graph [fontname="Arial", fontsize=14, bgcolor="white"];
+  node  [fontname="Arial", fontsize=13, shape=box, style="rounded,filled",
+         color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F", penwidth=1.5, margin="0.16,0.08"];
+  edge  [fontname="Arial", fontsize=12, color="#555555", arrowsize=0.9];
+
+  subgraph cluster_canonical {
+    label="Canonical path (upstream repo)"; style="rounded"; color="#FBBF24"; fontcolor="#78350F"; fontsize=14;
+    p1 [label="Push to main", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+    w1 [label="Render dashboard webhook"];
+    d1 [label="Render deploy"];
+    l1 [label=<Live API service<br/>GET /health &gt; status ok>, color="#16A34A", fillcolor="#DCFCE7", fontcolor="#14532D"];
+    {rank=same; p1; w1; d1; l1;}
+    p1 -> w1 -> d1 -> l1;
+  }
+
+  subgraph cluster_action {
+    label="Action path (this repo)"; style="rounded"; color="#FBBF24"; fontcolor="#78350F"; fontsize=14;
+    p2 [label="Push to main / tweaks", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+    ga [label="GitHub Action render-deploy.yml"];
+    gd [label=<RENDER_SERVICE_ID<br/>variable set?>, shape=diamond, style="filled", fillcolor="#E5E7EB", color="#4B5563", fontcolor="#1F2937"];
+    fail [label="Exit 1 with setup error message", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+    curl [label=<curl POST Render Deploy API<br/>Bearer RENDER_API_KEY, commitId=sha>];
+    rd   [label=<Render deploy at commitId<br/>rootDir: server, plan: free>];
+    l2   [label=<Live API service<br/>GET /health &gt; status ok>, color="#16A34A", fillcolor="#DCFCE7", fontcolor="#14532D"];
+    {rank=same; p2; ga; gd; fail;}
+    p2 -> ga -> gd;
+    gd -> fail [label="no", color="#DC2626"];
+    gd -> curl [label="yes"];
+    curl -> rd -> l2;
+  }
+
+  subgraph cluster_frontend {
+    label="Frontend path (Vercel)"; style="rounded"; color="#60A5FA"; fontcolor="#1E3A8A"; fontsize=14;
+    p3 [label="Push to GitHub", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+    vb [label=<Vercel build<br/>VITE_API_URL baked in>, color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A"];
+    fl [label=<Frontend URL<br/>nutri-basket-six.vercel.app>, color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A"];
+    {rank=same; p3; vb; fl;}
+    p3 -> vb -> fl;
+  }
+
+  subgraph cluster_self {
+    label="Manual / self-hosting"; style="rounded"; color="#FBBF24"; fontcolor="#78350F"; fontsize=14;
+    bp [label="Render dashboard + render.yaml blueprint", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+    md [label=<Manual deploy<br/>set CLIENT_ORIGIN, OFF_BASE_URL>];
+    {rank=same; bp; md;}
+    bp -> md;
+  }
+
+  p1 -> p2 [style=invis];
+  p2 -> p3 [style=invis];
+  p3 -> bp [style=invis];
+}

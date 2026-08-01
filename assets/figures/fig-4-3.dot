@@ -1,0 +1,41 @@
+digraph workflow {
+  rankdir=TB;
+  nodesep=0.5; ranksep=0.5;
+  graph [fontname="Arial", fontsize=14, bgcolor="white"];
+  node  [fontname="Arial", fontsize=13, shape=box, style="rounded,filled",
+         color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A", penwidth=1.5, margin="0.16,0.08"];
+  edge  [fontname="Arial", fontsize=12, color="#555555", arrowsize=0.9];
+
+  welcome [label="Welcome", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+  home    [label="Home", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+  scan    [label="Scan screen", color="#4B5563", fillcolor="#E5E7EB", fontcolor="#1F2937"];
+  camera  [label="Camera scan via ZXing"];
+  manual  [label=<Manual barcode entry<br/>GTIN check-digit validation>];
+  loading [label="App lookup: loading"];
+  hint    [label=<Cold-start hint<br/>server wake-up can take ~40s>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+  product [label=<ProductInfo<br/>nutrition card + price entry>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  price   [label=<Enter price<br/>regex: digits, up to 2 decimals>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  add     [label=<Add to Basket<br/>dedupe by id, quantity +1>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  basket  [label=<Basket<br/>total amount + nutrition summary>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B", style="rounded,filled,bold"];
+  checkout [label=<Checkout<br/>UPI QR placeholder>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+  success [label=<Payment Success<br/>generated NB transaction id>, color="#16A34A", fillcolor="#DCFCE7", fontcolor="#14532D"];
+
+  notfound [label="Product Not Found", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+  error    [label="Something Went Wrong (network / upstream)", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+
+  welcome -> home -> scan;
+  scan -> camera;
+  camera -> loading;
+  camera -> manual [label="denied / no camera / busy / error", color="#DC2626"];
+  manual -> loading;
+  loading -> hint [label="after 5s"];
+  hint -> loading [dir=back, style=dashed, label="wake-up loop", color="#9CA3AF"];
+  loading -> product;
+  product -> price -> add -> basket -> checkout -> success;
+  success -> home [label="finish shopping", style=dashed, color="#9CA3AF"];
+
+  loading -> notfound [label="not-found", color="#DC2626"];
+  notfound -> scan [label="go back", color="#DC2626", style=dashed];
+  loading -> error [label="error", color="#DC2626"];
+  error -> loading [label="Retry (last barcode)", color="#DC2626", style=dashed];
+}

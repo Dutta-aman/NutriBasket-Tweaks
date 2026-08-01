@@ -1,0 +1,48 @@
+digraph api_lifecycle {
+  rankdir=TB;
+  nodesep=0.45; ranksep=0.55;
+  graph [fontname="Arial", fontsize=14, bgcolor="white"];
+  node  [fontname="Arial", fontsize=13, shape=box, style="rounded,filled",
+         color="#2563EB", fillcolor="#DBEAFE", fontcolor="#1E3A8A", penwidth=1.5, margin="0.18,0.09"];
+  edge  [fontname="Arial", fontsize=12, color="#555555", arrowsize=0.9];
+
+  client [label="Client (browser)"];
+  route  [label=<Express route<br/>GET /api/products/:barcode>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  off    [label=<off.js lookup<br/>getProductByBarcode()>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+
+  d1     [label=<GTIN check<br/>digit valid?>, shape=diamond, style="filled", fillcolor="#E5E7EB", color="#4B5563", fontcolor="#1F2937"];
+  b400   [label="400 invalid_barcode", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+
+  d2     [label=<In 24h<br/>cache?>, shape=diamond, style="filled", fillcolor="#E5E7EB", color="#4B5563", fontcolor="#1F2937"];
+  hit    [label="200 cached product", color="#16A34A", fillcolor="#DCFCE7", fontcolor="#14532D"];
+
+  offfetch [label=<Open Food Facts<br/>GET /api/v2/product/{code}.json (10s timeout)>, color="#6B7280", fillcolor="#F3F4F6", fontcolor="#374151"];
+  retry    [label=<503 from OFF<br/>retry with 800ms backoff (2nd attempt)>, color="#D97706", fillcolor="#FEF3C7", fontcolor="#78350F"];
+
+  d3     [label=<Product found with<br/>product_name?>, shape=diamond, style="filled", fillcolor="#E5E7EB", color="#4B5563", fontcolor="#1F2937"];
+  norm   [label=<normalizeProduct()<br/>_100g to _serving to plain, NaN-proof>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  store  [label=<store in 24h cache (TTL)>, color="#059669", fillcolor="#D1FAE5", fontcolor="#064E3B"];
+  ok     [label="200 normalized product", color="#16A34A", fillcolor="#DCFCE7", fontcolor="#14532D"];
+  b404   [label="404 product_not_found", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+  b502   [label="502 upstream_error", color="#DC2626", fillcolor="#FEE2E2", fontcolor="#7F1D1D"];
+
+  client -> route;
+  route -> off;
+  off -> d1;
+  d1 -> b400 [label="no", color="#DC2626"];
+  b400 -> client [style=dashed, color="#9CA3AF"];
+  d1 -> d2 [label="yes"];
+  d2 -> hit [label="hit"];
+  hit -> client [style=dashed, color="#9CA3AF"];
+  d2 -> offfetch [label="miss"];
+  offfetch -> retry [label="503"];
+  retry -> offfetch [label="retry", dir=back, color="#9CA3AF", style=dashed];
+  offfetch -> d3;
+  d3 -> norm [label="yes"];
+  norm -> store;
+  store -> ok;
+  ok -> client [style=dashed, color="#9CA3AF"];
+  d3 -> b404 [label="no", color="#DC2626"];
+  b404 -> client [style=dashed, color="#9CA3AF"];
+  retry -> b502 [label="retries exhausted", color="#DC2626"];
+}
