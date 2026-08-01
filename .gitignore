@@ -20,6 +20,10 @@ dist-ssr
 # Vercel
 .vercel
 
+# Secrets (never commit keys)
+*API*.txt
+*key*.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

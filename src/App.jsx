@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Welcome from "./screens/Welcome";
 import Home from "./screens/Home";
@@ -22,6 +22,21 @@ function App() {
   const [lookup, setLookup] = useState("idle");
 
   const [prices, setPrices] = useState({});
+
+  const [slowLookup, setSlowLookup] = useState(false);
+
+  useEffect(() => {
+
+    if (lookup !== "loading") {
+      setSlowLookup(false);
+      return;
+    }
+
+    const timer = setTimeout(() => setSlowLookup(true), 5000);
+
+    return () => clearTimeout(timer);
+
+  }, [lookup]);
 
   function handleScanned(barcode) {
 
@@ -180,6 +195,11 @@ function App() {
           <div className="product-card">
             <h1>Searching…</h1>
             <p>Fetching nutrition information.</p>
+            {slowLookup && (
+              <p className="lookup-hint">
+                Waking up the server — first request can take ~40s.
+              </p>
+            )}
           </div>
         </div>
       );
