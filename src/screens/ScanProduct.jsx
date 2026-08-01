@@ -1,39 +1,41 @@
+import { useState } from "react";
 import "./../styles/global.css";
-import products from "./../data/products";
-
+import BarcodeScanner from "./../components/scanner/BarcodeScanner";
+import { gtinCheckDigitValid } from "./../lib/barcode";
 
 function ScanProduct({ onProduct }) {
 
+  const [manualCode, setManualCode] = useState("");
 
-  function simulateScan(){
+  const [manualError, setManualError] = useState("");
 
+  function handleManualSubmit(event) {
 
-    const randomIndex = Math.floor(
-      Math.random() * products.length
-    );
+    event.preventDefault();
 
+    const code = manualCode.trim();
 
-    const product = products[randomIndex];
+    if (!gtinCheckDigitValid(code)) {
 
+      setManualError("Enter a valid 8-14 digit barcode");
 
-    onProduct(product.id);
+      return;
 
+    }
+
+    setManualError("");
+
+    onProduct(code);
 
   }
-
-
 
   return (
 
     <div className="scan-container">
 
-
       <div className="scan-card premium-scan">
 
-
-
         <div className="scan-header">
-
 
           <div className="scan-icon">
 
@@ -41,13 +43,11 @@ function ScanProduct({ onProduct }) {
 
           </div>
 
-
           <h1>
 
             Product Scanner
 
           </h1>
-
 
           <p>
 
@@ -56,91 +56,60 @@ function ScanProduct({ onProduct }) {
 
           </p>
 
-
         </div>
 
+        <BarcodeScanner onDetected={onProduct} />
 
+        <form className="manual-form" onSubmit={handleManualSubmit}>
 
+          <input
 
+            className="manual-input"
 
-        <div className="scanner-ui">
+            type="text"
 
+            inputMode="numeric"
 
-          <div className="scanner-frame premium-scanner">
+            maxLength="14"
 
+            placeholder="Or enter barcode manually…"
 
-            <div className="scan-corner top-left"></div>
+            value={manualCode}
 
-            <div className="scan-corner top-right"></div>
+            onChange={(event) => setManualCode(event.target.value)}
 
-            <div className="scan-corner bottom-left"></div>
+          />
 
-            <div className="scan-corner bottom-right"></div>
+          <button
 
+            type="submit"
 
-            <div className="scan-line"></div>
+            className="secondary-btn manual-btn"
 
+          >
 
-          </div>
+            🔍 Look Up
 
+          </button>
 
-        </div>
+        </form>
 
+        {manualError && (
 
+          <p className="manual-error">
 
+            {manualError}
 
+          </p>
 
-        <div className="scanner-status premium-status">
-
-
-          <span>
-
-            🟢
-
-          </span>
-
-
-          Ready to Scan
-
-
-        </div>
-
-
-
-
-
-        <p className="scan-help">
-
-          Place barcode inside the frame
-
-        </p>
-
-
-
-
-
-        <button
-
-          className="start-btn premium-btn"
-
-          onClick={simulateScan}
-
-        >
-
-          ⚡ Scan Product
-
-        </button>
-
-
+        )}
 
       </div>
-
 
     </div>
 
   );
 
 }
-
 
 export default ScanProduct;

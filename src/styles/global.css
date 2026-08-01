@@ -466,8 +466,6 @@ body{
 
 }
 
-
-
 @keyframes scan{
 
   from{
@@ -1619,3 +1617,206 @@ h1,h2,h3{
 
 
 }
+
+
+/* ================= Phase B: Scanner & Product ================= */
+
+
+.scanner-video{
+
+  position:absolute;
+
+  inset:0;
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:cover;
+
+  display:block;
+
+}
+
+
+
+.scanner-overlay{
+
+  position:absolute;
+
+  inset:0;
+
+  display:flex;
+
+  justify-content:center;
+
+  align-items:center;
+
+  font-size:56px;
+
+  opacity:.9;
+
+  background:rgba(0,0,0,.25);
+
+}
+
+
+
+.manual-form{
+
+  display:flex;
+
+  gap:12px;
+
+  justify-content:center;
+
+  margin-top:25px;
+
+  flex-wrap:wrap;
+
+}
+
+
+
+.manual-input{
+
+  flex:1;
+
+  max-width:320px;
+
+  padding:14px 18px;
+
+  border-radius:14px;
+
+  border:1px solid var(--border);
+
+  background:rgba(255,255,255,.10);
+
+  color:white;
+
+  font-size:16px;
+
+  outline:none;
+
+  letter-spacing:1px;
+
+}
+
+
+
+.manual-input::placeholder{
+
+  color:var(--text-muted);
+
+}
+
+
+
+.manual-input:focus{
+
+  border-color:var(--primary);
+
+}
+
+
+
+.manual-btn{
+
+  padding:14px 22px;
+
+  font-size:16px;
+
+  flex:0 0 auto;
+
+}
+
+
+
+.manual-error{
+
+  margin-top:14px;
+
+  color:#f87171;
+
+  font-size:14px;
+
+}
+
+
+
+.product-photo{
+
+  width:110px;
+
+  height:110px;
+
+  object-fit:cover;
+
+  border-radius:18px;
+
+  margin:0 auto 15px;
+
+  border:1px solid var(--border);
+
+  display:block;
+
+}
+
+
+
+.price-input{
+
+  width:110px;
+
+  padding:10px 12px;
+
+  border-radius:12px;
+
+  border:1px solid var(--border);
+
+  background:rgba(255,255,255,.10);
+
+  color:white;
+
+  font-size:24px;
+
+  font-weight:700;
+
+  text-align:center;
+
+  outline:none;
+
+  margin-bottom:6px;
+
+}
+
+
+
+.price-input::placeholder{
+
+  color:var(--text-muted);
+
+  font-size:20px;
+
+}
+
+
+
+.price-input:focus{
+
+  border-color:var(--primary);
+
+}
+
+
+
+.start-btn:disabled{
+
+  opacity:.5;
+
+  cursor:not-allowed;
+
+  transform:none;
+
+}
+

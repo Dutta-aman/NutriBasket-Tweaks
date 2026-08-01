@@ -7,6 +7,7 @@ import ProductInfo from "./screens/ProductInfo";
 import Basket from "./screens/Basket";
 import Checkout from "./screens/Checkout";
 import PaymentSuccess from "./screens/PaymentSuccess";
+import { fetchProductByBarcode } from "./lib/api";
 
 function App() {
 
@@ -16,17 +17,67 @@ function App() {
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const [lastBarcode, setLastBarcode] = useState(null);
+
+  const [lookup, setLookup] = useState("idle");
+
+  const [prices, setPrices] = useState({});
+
+  function handleScanned(barcode) {
+
+    setLastBarcode(barcode);
+
+    setSelectedProduct(null);
+
+    setLookup("loading");
+
+    setPage("product");
+
+    fetchProductByBarcode(barcode)
+
+      .then((product) => {
+
+        if (!product) {
+
+          setLookup("not-found");
+
+          return;
+
+        }
+
+        setSelectedProduct(product);
+
+        setLookup("ready");
+
+      })
+
+      .catch(() => {
+
+        setLookup("error");
+
+      });
+
+  }
+
+  function setPrice(barcode, price) {
+
+    setPrices((prev) => ({ ...prev, [barcode]: price }));
+
+  }
+
   function addProduct(product) {
 
+    const priced = { ...product, price: prices[product.id] || 0 };
+
     const existing = basket.find(
-      item => item.id === product.id
+      item => item.id === priced.id
     );
 
     if (existing) {
 
       const updated = basket.map(item =>
 
-        item.id === product.id
+        item.id === priced.id
           ? {
               ...item,
               quantity: (item.quantity || 1) + 1
@@ -42,7 +93,7 @@ function App() {
       setBasket([
         ...basket,
         {
-          ...product,
+          ...priced,
           quantity: 1
         }
       ]);
@@ -81,6 +132,8 @@ function App() {
 
     setSelectedProduct(null);
 
+    setLookup("idle");
+
     setPage("home");
 
   }
@@ -102,6 +155,7 @@ function App() {
         basket={basket}
         onScan={() => setPage("scan")}
         onBasket={() => setPage("basket")}
+        onCheckout={() => setPage("checkout")}
       />
     );
 
@@ -111,13 +165,7 @@ function App() {
 
     return (
       <ScanProduct
-        onProduct={(id) => {
-
-          setSelectedProduct(id);
-
-          setPage("product");
-
-        }}
+        onProduct={handleScanned}
       />
     );
 
@@ -125,13 +173,80 @@ function App() {
 
   if (page === "product") {
 
-    return (
-      <ProductInfo
-        productId={selectedProduct}
-        onBack={() => setPage("home")}
-        onAdd={addProduct}
-      />
-    );
+    if (lookup === "loading") {
+
+      return (
+        <div className="product-container">
+          <div className="product-card">
+            <h1>Searching…</h1>
+            <p>Fetching nutrition information.</p>
+          </div>
+        </div>
+      );
+
+    }
+
+    if (lookup === "not-found") {
+
+      return (
+        <div className="product-container">
+          <div className="product-card">
+            <h1>Product Not Found</h1>
+            <p>This barcode is not in the nutrition database.</p>
+            <button
+              className="start-btn premium-btn"
+              onClick={() => setPage("scan")}
+            >
+              ← Try Another
+            </button>
+          </div>
+        </div>
+      );
+
+    }
+
+    if (lookup === "error") {
+
+      return (
+        <div className="product-container">
+          <div className="product-card">
+            <h1>Something Went Wrong</h1>
+            <p>Could not reach the nutrition database.</p>
+            <div className="product-buttons">
+              <button
+                className="secondary-btn"
+                onClick={() => setPage("scan")}
+              >
+                ← Back
+              </button>
+              <button
+                className="start-btn premium-btn"
+                onClick={() => handleScanned(lastBarcode)}
+              >
+                🔄 Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+
+    }
+
+    if (selectedProduct) {
+
+      return (
+        <ProductInfo
+          product={selectedProduct}
+          price={prices[selectedProduct.id] ?? null}
+          onSetPrice={setPrice}
+          onBack={() => setPage("scan")}
+          onAdd={addProduct}
+        />
+      );
+
+    }
+
+    return null;
 
   }
 

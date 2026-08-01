@@ -1,61 +1,55 @@
+import { useState } from "react";
 import "./../styles/global.css";
-import products from "./../data/products";
 
-
-function ProductInfo({ 
-  productId,
+function ProductInfo({
+  product,
+  price,
+  onSetPrice,
   onAdd,
   onBack
 }) {
 
+  const [priceInput, setPriceInput] = useState("");
 
-  const product = products.find(
-    item => item.id === productId
-  );
+  function handleAdd() {
 
+    if (price === null) {
 
+      if (!priceInput.trim()) return;
 
-  if(!product){
+      onSetPrice(product.id, Number(priceInput));
 
-    return (
+    }
 
-      <div className="product-container">
-
-        <div className="product-card">
-
-          <h1>
-            Product Not Found
-          </h1>
-
-        </div>
-
-      </div>
-
-    );
+    onAdd(product);
 
   }
-
-
 
   return (
 
     <div className="product-container">
 
-
       <div className="product-card premium-product">
-
-
 
         <div className="product-hero">
 
+          {product.image_url ? (
 
-          <div className="product-image premium-product-icon">
+            <img
+              className="product-photo"
+              src={product.image_url}
+              alt={product.name}
+            />
 
-            🛒
+          ) : (
 
-          </div>
+            <div className="product-image premium-product-icon">
 
+              🛒
 
+            </div>
+
+          )}
 
           <h1>
 
@@ -63,40 +57,53 @@ function ProductInfo({
 
           </h1>
 
-
-
           <p className="brand premium-brand">
 
             🏷 {product.brand}
 
           </p>
 
-
         </div>
-
-
-
-
 
         <div className="nutrition-grid premium-nutrition">
 
-
-
           <div className="price-card">
 
-            <h2>
-              ₹{product.price}
-            </h2>
+            {price === null ? (
+
+              <input
+
+                className="price-input"
+
+                type="number"
+
+                min="0"
+
+                step="0.5"
+
+                placeholder="₹"
+
+                value={priceInput}
+
+                onChange={(event) => setPriceInput(event.target.value)}
+
+              />
+
+            ) : (
+
+              <h2>
+                ₹{price}
+              </h2>
+
+            )}
 
             <span>
-              Price
+
+              {price === null ? "Enter Price" : "Price"}
+
             </span>
 
           </div>
-
-
-
-
 
           <div>
 
@@ -110,10 +117,6 @@ function ProductInfo({
 
           </div>
 
-
-
-
-
           <div>
 
             <h2>
@@ -125,10 +128,6 @@ function ProductInfo({
             </span>
 
           </div>
-
-
-
-
 
           <div>
 
@@ -142,10 +141,6 @@ function ProductInfo({
 
           </div>
 
-
-
-
-
           <div>
 
             <h2>
@@ -158,17 +153,9 @@ function ProductInfo({
 
           </div>
 
-
         </div>
 
-
-
-
-
-
         <div className="product-buttons premium-product-buttons">
-
-
 
           <button
 
@@ -182,15 +169,13 @@ function ProductInfo({
 
           </button>
 
-
-
-
-
           <button
 
             className="start-btn premium-btn"
 
-            onClick={() => onAdd(product)}
+            onClick={handleAdd}
+
+            disabled={price === null && !priceInput.trim()}
 
           >
 
@@ -198,21 +183,14 @@ function ProductInfo({
 
           </button>
 
-
-
         </div>
 
-
-
-
       </div>
-
 
     </div>
 
   );
 
 }
-
 
 export default ProductInfo;
