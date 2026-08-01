@@ -12,6 +12,10 @@ The app runs on branch `tweaks`. History: 11 original commits (upstream UI work 
 
 See [PROJECT_DIAGRAM.md](PROJECT_DIAGRAM.md) for visual Mermaid diagrams of the project: system architecture (frontend + backend + Open Food Facts + deployment pipelines), frontend component tree, user workflow (with fallback paths), backend API lifecycle (sequence diagram), deployment lifecycle, and the API endpoint reference.
 
+## Project Report
+
+See [PROJECT_REPORT.md](PROJECT_REPORT.md) for the final-year project report working draft (B.Tech format: declaration, certificate, abstract, chapters 1–7, IEEE references, appendices). Fields marked `[PLACEHOLDER]` (names, roll numbers, guide, college) must be filled before submission; screenshots marked `[INSERT SCREENSHOT]` must be captured from the live app.
+
 ---
 
 ## Features
