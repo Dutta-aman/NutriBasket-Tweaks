@@ -9,6 +9,13 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*" }));
 
+app.get("/", (req, res) => {
+  res.json({
+    service: "NutriBasket API",
+    endpoints: ["/health", "/api/products/:barcode"],
+  });
+});
+
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
