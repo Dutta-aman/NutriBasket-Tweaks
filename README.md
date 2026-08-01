@@ -8,6 +8,10 @@ NutriBasket is a grocery and nutrition assistant web app: scan a product's barco
 
 The app runs on branch `tweaks`. History: 11 original commits (upstream UI work by madhushreeG7 plus fork documentation commits by Dutta-aman), followed by commit `b209376` ("Add Express backend with Open Food Facts lookup (server/)") which added `server/` and `render.yaml`. The frontend work described under "Phase A" and "Phase B" below is committed on this branch. Remotes: `origin` = Dutta-aman/NutriBasket, `upstream` = madhushreemail-stack/NutriBasket.
 
+## Project Diagram
+
+See [PROJECT_DIAGRAM.md](PROJECT_DIAGRAM.md) for visual Mermaid diagrams of the project: system architecture (frontend + backend + Open Food Facts + deployment pipelines), frontend component tree, user workflow (with fallback paths), backend API lifecycle (sequence diagram), deployment lifecycle, and the API endpoint reference.
+
 ---
 
 ## Features
@@ -212,6 +216,19 @@ Verified live: Nutella (barcode `3017624010701`) returns normalized nutrition da
 
 ---
 
+## What Changed — Phase C (bug fixes + hardening)
+
+Two follow-up commits addressing real breakage and silent-failure gaps:
+
+1. **Invalid price input no longer poisons basket totals** (`87cd60c`) — the Add to Basket button previously only checked that the price field was non-empty, so values like `e`, `1e5`, `1.2.3`, or `-5` became `NaN` and flowed into every total in Basket, Checkout, and PaymentSuccess (₹NaN everywhere). `ProductInfo.jsx` now validates with `/^\d+(\.\d{1,2})?$/` on the trimmed input — the button stays disabled and `onSetPrice` is guarded until the value is a plain positive amount with at most 2 decimals.
+2. **Resilience trio** (`e80c4f3`):
+   - **Error boundary** — new `src/components/ErrorBoundary.jsx` wraps `<App/>` in `main.jsx`; an unexpected render error now shows a styled "Something Went Wrong" screen with a restart button instead of a white screen.
+   - **Cold-start hint** — `App.jsx` shows a hint under "Searching…" after ~5 seconds of pending lookup ("Waking up the server — first request can take ~40s") so Render's free-tier cold start doesn't look like a hang; the timer is cleaned up correctly.
+   - **CORS console note** — `src/lib/api.js` catches `TypeError` (browser "Failed to fetch" — the signature of a CORS/network failure) and logs a diagnosis hint pointing at `CLIENT_ORIGIN` / `VITE_API_URL`, then rethrows so UI behavior is unchanged.
+   - **Secret hygiene** — `.gitignore` now blocks `*API*.txt` / `*key*.txt` so API keys can never be accidentally committed.
+
+---
+
 ## Current State of the Repo
 
 ### File tree
@@ -219,12 +236,13 @@ Verified live: Nutella (barcode `3017624010701`) returns normalized nutrition da
 ```
 NutriBasket/
 ├── .env.example                    # VITE_API_URL documented
-├── .gitignore                      # node_modules, dist, .env*, .vercel, editors
+├── .gitignore                      # node_modules, dist, .env*, .vercel, secrets, editors
 ├── .github/
 │   └── workflows/
 │       └── render-deploy.yml       # GitHub Action → Render API auto-deploy
 ├── .oxlintrc.json                  # remote $schema + react/oxc plugins
 ├── IMPROVEMENT.md                  # improvement plan (barcode & QR scanner integration)
+├── PROJECT_DIAGRAM.md              # mermaid architecture/workflow/deployment diagrams
 ├── README.md                       # this file
 ├── assets/
 │   └── banner.svg                  # banner image
@@ -240,6 +258,7 @@ NutriBasket/
 │   ├── main.jsx
 │   ├── App.jsx                     # screen routing + scan flow + basket state
 │   ├── components/
+│   │   ├── ErrorBoundary.jsx        # render-crash fallback + restart
 │   │   ├── layout/
 │   │   │   └── AppLayout.jsx
 │   │   └── scanner/
