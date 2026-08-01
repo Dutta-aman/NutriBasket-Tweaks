@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: nutribasket-api
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: CLIENT_ORIGIN
+        value: https://nutri-basket-six.vercel.app
