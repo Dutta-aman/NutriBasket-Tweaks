@@ -67,8 +67,29 @@ The app runs on branch `tweaks`. History: 11 original commits (upstream UI work 
 
 - The frontend reads `VITE_API_URL` at build time; in production it is set to `https://nutribasket-api.onrender.com`, so all `/api/products/:barcode` calls go to Render.
 - The backend runs on the Render **free tier**, which spins down after ~15 minutes of inactivity. **The first request after an idle period can take ~40 seconds** (cold start); subsequent requests are fast.
-- The Render Blueprint (`render.yaml`) defines the service; a manual Render service is also wired to the `tweaks` branch with auto-deploy configured on commit and a `/health` health check. Render's GitHub webhook is not registered on the repo (the service was created via CLI), so auto-deploys are driven by a GitHub Action (`.github/workflows/render-deploy.yml`) that calls the Render API trigger endpoint on every push to `tweaks`, using a Render API key stored as the `RENDER_API_KEY` repo secret. The key is a short-lived CLI session token — replace it with a long-lived API key from Render dashboard (Account → API Keys) when it expires.
+- The Render Blueprint (`render.yaml`) defines the service. This fork's dev-channel service is wired to the `tweaks` branch; because it was created via the Render CLI (no GitHub webhook registered), auto-deploys are driven by a GitHub Action (`.github/workflows/render-deploy.yml`) that calls the Render API trigger endpoint with `commitId: ${{ github.sha }}` on every push to `main` or `tweaks`. Per-repo config lives in repo settings: the `RENDER_API_KEY` secret (long-lived Render API key) and the `RENDER_SERVICE_ID` variable (the `srv-...` service id). See "Deployment Model" below.
 - Browsing the API root (`https://nutribasket-api.onrender.com/`) returns service info JSON — `GET /`, `/health`, and `/api/products/:barcode` all respond 200.
+
+## Deployment Model
+
+Two tracks plus self-service:
+
+| Track | Code source | Owner | Auto-deploy mechanism |
+| --- | --- | --- | --- |
+| **Dev channel** | this fork's `tweaks` (and `main`) | fork owner | GitHub Action → Render API (`RENDER_API_KEY` secret + `RENDER_SERVICE_ID` variable) |
+| **Canonical (the project's shared deployment)** | upstream repo `main` (after PR merge) | upstream repo owner | Render dashboard connection (native GitHub webhook) — recommended; or the same Action route |
+
+- **Fork → upstream:** a PR merged into upstream `main` triggers the canonical deployment, so the whole team uses that URL.
+- **Upstream → fork:** a PR merged into this fork's branch triggers this fork's Action and deploys the dev channel.
+- **PRs themselves never deploy** — only merges (pushes) do.
+- **Webhook vs Action:** pick one per repo. Connecting the repo in the Render dashboard registers the webhook (native auto-deploy, no secrets needed). The Action route is for CLI-created services: set `RENDER_API_KEY` (Render account → API Keys → long-lived key) and `RENDER_SERVICE_ID` (the `srv-...` id) under Settings → Secrets and variables → Actions. If both are configured the repo deploys twice per push (harmless); if the Action is unconfigured it fails loudly and the webhook still deploys.
+
+**Deploy your own instance (anyone using the project):**
+
+1. Create a free Render account.
+2. Render dashboard → New → Blueprint → connect your repo fork (the committed `render.yaml` defines everything: `rootDir: server`, Node runtime, free plan, build `npm install`, start `npm start`, health check `/health`). Set the `CLIENT_ORIGIN` env var to your frontend URL. Connecting via the dashboard registers the webhook, so every push to `main` auto-deploys.
+3. For the frontend: create a Vercel project from the repo (framework Vite) and set the `VITE_API_URL` env var to your Render service URL.
+4. If you created the Render service via CLI instead of the dashboard, configure the two Actions settings described above.
 
 ---
 

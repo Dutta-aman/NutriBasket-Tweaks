@@ -2,16 +2,22 @@ name: Deploy to Render
 
 on:
   push:
-    branches: [tweaks]
+    branches: [main, tweaks]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Guard — RENDER_SERVICE_ID must be set
+        if: vars.RENDER_SERVICE_ID == ''
+        run: |
+          echo "::error::Set the RENDER_SERVICE_ID repo variable (Settings → Secrets and variables → Actions → Variables) to your Render service ID (srv-...)."
+          exit 1
+
       - name: Trigger Render deploy
         run: |
           curl -sS -X POST \
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -d '{"clearCache":"do_not_clear"}' \
-            https://api.render.com/v1/services/srv-d9mu74bl550s738vnipg/deploys
+            -d '{"clearCache":"do_not_clear","commitId":"${{ github.sha }}"}' \
+            https://api.render.com/v1/services/${{ vars.RENDER_SERVICE_ID }}/deploys
