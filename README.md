@@ -342,14 +342,13 @@ npm run build   # production build to dist/
 
 ## Roadmap / Next Steps
 
-1. **Push to GitHub** — the committed frontend work is on the local `tweaks` branch; `git push origin tweaks` shares it with the team (Render auto-deploys the backend on push)
-2. **Automated tests** — introduce a test runner (e.g. Vitest) with unit tests for `gtinCheckDigitValid`, the API client, and backend endpoints; add an end-to-end scan → fetch → display → basket flow test
-3. **Zustand migration** — replace `useState` basket/session state with a Zustand store (per IMPROVEMENT.md)
-4. **Supabase persistence** — persist baskets and scan history per user/session (optional per the plan)
-5. **Real UPI payment QR** — replace the Checkout QR placeholder and the random transaction id with a real payment flow
-6. **Code-splitting the scanner bundle** — lazy-load `BarcodeScanner` to cut the ~687 KB initial bundle
-7. **AI nutrition scoring** — the future phase described at the end of IMPROVEMENT.md
-8. **Possibly Tailwind CSS** — the plan originally called for it; plain CSS was chosen instead
+1. **Automated tests** — introduce a test runner (e.g. Vitest) with unit tests for `gtinCheckDigitValid`, the API client, and backend endpoints; add an end-to-end scan → fetch → display → basket flow test
+2. **Zustand migration** — replace `useState` basket/session state with a Zustand store (per IMPROVEMENT.md)
+3. **Supabase persistence** — persist baskets and scan history per user/session (optional per the plan)
+4. **Real UPI payment QR** — replace the Checkout QR placeholder and the random transaction id with a real payment flow
+5. **Code-splitting the scanner bundle** — lazy-load `BarcodeScanner` to cut the ~687 KB initial bundle
+6. **AI nutrition scoring** — the future phase described at the end of IMPROVEMENT.md
+7. **Possibly Tailwind CSS** — the plan originally called for it; plain CSS was chosen instead
 
 ---
 
