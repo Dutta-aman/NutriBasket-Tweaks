@@ -104,7 +104,7 @@ function BarcodeScanner({ onDetected }) {
         </div>
       </div>
 
-      <div className="scanner-status premium-status">
+      <div className="scanner-status premium-status" role="status" aria-live="polite">
         <span>{bad ? "🔴" : status === "starting" ? "⏳" : "🟢"}</span>
         {STATUS_TEXT[status]}
       </div>

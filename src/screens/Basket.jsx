@@ -100,6 +100,7 @@ function Basket({
 
                     <button
                       className="qty-btn"
+                      aria-label="Decrease quantity"
                       onClick={() => updateQuantity(index, -1)}
                     >
                       −
@@ -109,6 +110,7 @@ function Basket({
 
                     <button
                       className="qty-btn"
+                      aria-label="Increase quantity"
                       onClick={() => updateQuantity(index, 1)}
                     >
                       +
@@ -122,6 +124,7 @@ function Basket({
 
                   <button
                     className="remove-btn"
+                    aria-label={"Remove " + item.name}
                     onClick={() => removeItem(index)}
                   >
                     Remove
