@@ -1,5 +1,7 @@
 import "./../styles/basket.css";
 
+function round2(n) { return Math.round(n * 100) / 100; }
+
 function Basket({
   basket,
   setBasket,
@@ -115,7 +117,7 @@ function Basket({
                   </div>
 
                   <h3>
-                    ₹{item.price * item.quantity}
+                    ₹{round2(item.price * item.quantity)}
                   </h3>
 
                   <button
@@ -165,7 +167,7 @@ function Basket({
 
               <h2>Total Amount</h2>
 
-              <h1>₹{totalAmount}</h1>
+              <h1>₹{round2(totalAmount)}</h1>
 
             </div>
 

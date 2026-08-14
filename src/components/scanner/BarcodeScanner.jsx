@@ -18,9 +18,11 @@ function BarcodeScanner({ onDetected }) {
   const controlsRef = useRef(null);
   const mountedRef = useRef(true);
   const lastScanRef = useRef({ text: "", at: 0 });
+  const generationRef = useRef(0);
   const [status, setStatus] = useState("idle");
 
   function stopScanner() {
+    generationRef.current += 1;
     controlsRef.current?.stop();
     controlsRef.current = null;
     BrowserCodeReader.releaseAllStreams();
@@ -30,6 +32,8 @@ function BarcodeScanner({ onDetected }) {
   }
 
   function startScanner() {
+    stopScanner();
+    const generation = generationRef.current;
     setStatus("starting");
     const codeReader = new BrowserMultiFormatReader(undefined, {
       delayBetweenScanAttempts: 300,
@@ -40,6 +44,7 @@ function BarcodeScanner({ onDetected }) {
     codeReader
       .decodeFromVideoDevice(undefined, videoRef.current, (result) => {
         if (!result || !mountedRef.current) return;
+        if (generation !== generationRef.current) return;
         const text = result.getText();
         const now = Date.now();
         if (text === lastScanRef.current.text && now - lastScanRef.current.at < 1500) {
@@ -55,7 +60,7 @@ function BarcodeScanner({ onDetected }) {
         onDetected(text);
       })
       .then((controls) => {
-        if (!mountedRef.current) {
+        if (!mountedRef.current || generation !== generationRef.current) {
           controls.stop();
           return;
         }
@@ -63,7 +68,7 @@ function BarcodeScanner({ onDetected }) {
         setStatus("scanning");
       })
       .catch((error) => {
-        if (!mountedRef.current) return;
+        if (!mountedRef.current || generation !== generationRef.current) return;
         if (error.name === "NotAllowedError") setStatus("denied");
         else if (error.name === "NotFoundError") setStatus("no-camera");
         else if (error.name === "NotReadableError") setStatus("busy");
