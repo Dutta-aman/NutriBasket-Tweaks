@@ -3,9 +3,10 @@ import { BrowserMultiFormatReader, BrowserCodeReader } from "@zxing/browser";
 import { gtinCheckDigitValid } from "../../lib/barcode";
 
 const STATUS_TEXT = {
-  idle: "Tap Start Camera",
+  idle: "Tap Scan Now to begin",
   starting: "Starting camera…",
   scanning: "Ready to Scan",
+  detected: "✅ Barcode captured — looking up…",
   denied: "Camera access blocked",
   "no-camera": "No camera found",
   busy: "Camera is busy",
@@ -19,6 +20,7 @@ function BarcodeScanner({ onDetected }) {
   const mountedRef = useRef(true);
   const lastScanRef = useRef({ text: "", at: 0 });
   const generationRef = useRef(0);
+  const detectedTimeoutRef = useRef(null);
   const [status, setStatus] = useState("idle");
 
   function stopScanner() {
@@ -29,6 +31,11 @@ function BarcodeScanner({ onDetected }) {
     if (videoRef.current) {
       BrowserCodeReader.cleanVideoSource(videoRef.current);
     }
+  }
+
+  function resetToIdle() {
+    stopScanner();
+    setStatus("idle");
   }
 
   function startScanner() {
@@ -52,12 +59,16 @@ function BarcodeScanner({ onDetected }) {
         }
         lastScanRef.current = { text, at: now };
         if (!gtinCheckDigitValid(text)) {
+          stopScanner();
           setStatus("invalid");
           return;
         }
-        setStatus("scanning");
+        setStatus("detected");
         stopScanner();
-        onDetected(text);
+        detectedTimeoutRef.current = setTimeout(() => {
+          if (!mountedRef.current) return;
+          onDetected(text);
+        }, 600);
       })
       .then((controls) => {
         if (!mountedRef.current || generation !== generationRef.current) {
@@ -80,6 +91,7 @@ function BarcodeScanner({ onDetected }) {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      clearTimeout(detectedTimeoutRef.current);
       stopScanner();
     };
   }, []);
@@ -91,7 +103,7 @@ function BarcodeScanner({ onDetected }) {
   return (
     <>
       <div className="scanner-ui">
-        <div className="scanner-frame premium-scanner">
+        <div className={`scanner-frame premium-scanner${status === "invalid" ? " scanner-invalid" : ""}`}>
           <video ref={videoRef} className="scanner-video" muted playsInline />
           <div className="scan-corner top-left"></div>
           <div className="scan-corner top-right"></div>
@@ -101,28 +113,31 @@ function BarcodeScanner({ onDetected }) {
           {status === "idle" && (
             <div className="scanner-overlay">📸</div>
           )}
+          {status === "detected" && (
+            <div className="scanner-success">✓</div>
+          )}
         </div>
       </div>
 
       <div className="scanner-status premium-status" role="status" aria-live="polite">
-        <span>{bad ? "🔴" : status === "starting" ? "⏳" : "🟢"}</span>
+        <span>{bad ? "🔴" : status === "starting" ? "⏳" : status === "detected" ? "✅" : "🟢"}</span>
         {STATUS_TEXT[status]}
       </div>
 
       <p className="scan-help">
-        {failed
+        {bad
           ? "You can still enter the barcode manually below."
           : "Place the barcode inside the frame"}
       </p>
 
       {status === "idle" && (
         <button className="start-btn premium-btn" onClick={startScanner}>
-          📸 Start Camera
+          📸 Scan Now
         </button>
       )}
 
-      {failed && (
-        <button className="start-btn premium-btn" onClick={startScanner}>
+      {bad && (
+        <button className="start-btn premium-btn" onClick={status === "invalid" ? resetToIdle : startScanner}>
           🔄 Try Again
         </button>
       )}
