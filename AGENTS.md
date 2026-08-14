@@ -22,7 +22,16 @@
 ## Current project direction (QR pivot)
 
 - Project changing: create product QRs (text/JSON/table format) → scan → full nutrition info (kcal, protein, carbs, total sugars, dietary fibre, total fat, saturated fat, cholesterol, sodium) + price + image
-- **Data source DECIDED (Discussion #31):** Open Food Facts **INDIA** (`in.openfoodfacts.org`), NOT global. Hybrid: local SQLite seeded from OFF India (~22K products) → live OFF IN API fallback → manual demo product entries. Scan both barcode AND QR. FSSAI has NO public API (FoSCoS captcha/encrypted; paid 3rd-party only) — never pursue FSSAI API. Barcodes contain only a numeric ID; nutrition/FSSAI data comes from DB lookup keyed by GTIN.
+- **Data source DECIDED (Discussion #31):** Open Food Facts **INDIA** (`in.openfoodfacts.org`), NOT global. Scan both barcode AND QR. FSSAI has NO public API (FoSCoS captcha/encrypted; paid 3rd-party only) — never pursue FSSAI API. Barcodes contain only a numeric ID; nutrition/FSSAI data comes from DB lookup keyed by GTIN.
+- **Seed architecture (Discussion #31, decided 14 Aug 2026):** TWO static SQLite seeds committed to the repo (plain git, no LFS — 5–15 MB fits GitHub limits):
+  - `seed/products.db` — full India seed (~22,458 products, trimmed to needed fields)
+  - `seed/demo.db` — ~300–500 curated popular Indian products (search API: `sort_by=unique_scans_n` + `tag_0=india`, prefer `890`-prefix codes, dedupe by code)
+  - **Server loads seed at startup READ-ONLY via Node 22.13+ built-in `node:sqlite`** (`new DatabaseSync(..., { readOnly: true })` + `PRAGMA mmap_size`) — no native compilation, ~ms open; serve `GET /api/products/:barcode` with gzip. Never write at runtime; `SEED_FILE` env switches seeds; `.node-version` ≥ 22.13 pinned.
+  - **Build must NOT fetch OFF data** (500 build-min/month Render budget + OFF forbids bulk API pulls). Seeds generated ONCE locally/Colab, committed; regenerate rarely.
+  - **22K seed pipeline (in progress):** OFF dump (Parquet 7.76 GB / CSV 0.9 GB gz / JSONL) → filter `countries_tags` contains `en:india` + nutrition present (~42% of India products have it) → trim fields → SQLite. Search API capped at 10,000 results (cannot do 22K) — verified 401/503 past page 100.
+  - **Images:** hotlink `images.openfoodfacts.org/...` (verified no referer check) — never redistribute (CC BY-SA).
+  - **License:** OFF data = **ODbL 1.0** — attribution required in README + app ("Contains information from Open Food Facts, made available under the Open Database License (ODbL)") + license URI; seed is a Derivative Database → keep public under ODbL; add LICENSE-ODbL notice file.
+  - **Schema fields:** code (STRING, leading zeros matter), product_name, brands, categories, image_url (construct from code+rev for Parquet), energy-kcal_100g, fat_100g, saturated-fat_100g, carbohydrates_100g, sugars_100g, fiber_100g, proteins_100g, salt_100g (CSV has sodium → ×2.5), serving_size, quantity, scans_n/unique_scans_n.
 - **AI = future only** (messenger: "good for diet / avoid")
 - Demo work exists in `demo/` folder: QR generation scripts, QR→table page, URL-table server
 - Scan feedback UX issue: #30 (trigger-based Scan button + success/fail feedback)
