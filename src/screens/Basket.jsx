@@ -59,7 +59,7 @@ function Basket({
               className="start-btn"
               onClick={onContinue}
             >
-              📷 Scan Products
+              🏠 Continue Shopping
             </button>
 
           </div>

@@ -1,3 +1,7 @@
+// DEPRECATED: dead code — this module is not imported anywhere.
+// Kept for reference only. Sample barcodes here have invalid GTIN check digits;
+// do not reuse them. Live data comes from the server (server/lib/off.js) and
+// the seed database (seed/demo.db). See issue #23.
 const products = [
   {
     id: 1,

@@ -45,7 +45,6 @@ function rateLimit(limitPerMinute) {
     next();
   };
 }
-
 app.get("/", (req, res) => {
   res.json({
     service: "NutriBasket API",
@@ -85,6 +84,18 @@ app.get("/api/products/:barcode", async (req, res) => {
       message: "Could not reach the nutrition database",
     });
   }
+});
+
+app.use("/api", (req, res) => {
+  res.status(404).json({ error: "not_found", message: "API route not found" });
+});
+
+app.use((err, req, res, _next) => {
+  console.error("Unhandled error:", err.message);
+  res.status(err.status || 500).json({
+    error: err.status === 400 ? "bad_request" : "internal_error",
+    message: err.status === 400 ? err.message : "Internal server error",
+  });
 });
 
 const port = process.env.PORT || 3001;
