@@ -19,11 +19,17 @@ function ProductInfo({
 
       if (!priceInputValid) return;
 
-      onSetPrice(product.id, Number(priceInput.trim()));
+      const finalPrice = Number(priceInput.trim());
+
+      onSetPrice(product.id, finalPrice);
+
+      onAdd(product, finalPrice);
+
+    } else {
+
+      onAdd(product, price);
 
     }
-
-    onAdd(product);
 
   }
 

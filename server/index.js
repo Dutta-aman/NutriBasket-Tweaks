@@ -6,8 +6,45 @@ import { getProductByBarcode, gtinCheckDigitValid } from "./lib/off.js";
 
 const app = express();
 
+const allowedOrigins = (process.env.CLIENT_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+if (!allowedOrigins.length) {
+  console.warn(
+    "CLIENT_ORIGIN is not set — CORS is disabled, cross-origin requests will be blocked. Set CLIENT_ORIGIN on Render."
+  );
+}
+
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || "*" }));
+app.use(
+  cors({
+    origin: allowedOrigins.length ? allowedOrigins : false,
+  })
+);
+
+function rateLimit(limitPerMinute) {
+  const hits = new Map();
+  const WINDOW_MS = 60 * 1000;
+  return (req, res, next) => {
+    const ip = req.ip || req.socket.remoteAddress || "unknown";
+    const now = Date.now();
+    const entry = hits.get(ip);
+    if (!entry || now - entry.windowStart >= WINDOW_MS) {
+      hits.set(ip, { windowStart: now, count: 1 });
+    } else {
+      entry.count += 1;
+      if (entry.count > limitPerMinute) {
+        return res.status(429).json({
+          error: "rate_limited",
+          message: `Too many requests — limit is ${limitPerMinute} per minute`,
+        });
+      }
+    }
+    next();
+  };
+}
 
 app.get("/", (req, res) => {
   res.json({
@@ -19,6 +56,8 @@ app.get("/", (req, res) => {
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use("/api/products", rateLimit(60));
 
 app.get("/api/products/:barcode", async (req, res) => {
   const { barcode } = req.params;
