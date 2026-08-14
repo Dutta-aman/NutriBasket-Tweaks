@@ -214,10 +214,14 @@ function Home({
               Fat
             </span>
 
-          </div>
+      </div>
 
+      <div className="home-footer">
+        Nutrition data © Open Food Facts contributors, licensed under ODbL 1.0
+      </div>
 
-        </div>
+    </div>
+
 
 
 

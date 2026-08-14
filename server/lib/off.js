@@ -1,6 +1,6 @@
 import { get, set } from "./cache.js";
 
-const BASE_URL = process.env.OFF_BASE_URL || "https://world.openfoodfacts.org";
+const BASE_URL = process.env.OFF_BASE_URL || "https://in.openfoodfacts.org";
 const USER_AGENT = "NutriBasket/1.0 (contact@nutribasket.app)";
 const TIMEOUT_MS = 10000;
 const VALID_LENGTHS = [8, 12, 13, 14];
@@ -76,6 +76,7 @@ function normalizeProduct(code, data) {
     image_url: p.image_front_url || p.image_url || null,
     pack_quantity: p.quantity || null,
     price_inr: null,
+    source: "off",
     calories: pickFirst(n["energy-kcal_100g"], n["energy-kcal_serving"], n["energy-kcal"]),
     protein: pickFirst(n.proteins_100g, n.proteins_serving, n.proteins),
     carbs: pickFirst(n.carbohydrates_100g, n.carbohydrates_serving, n.carbohydrates),
