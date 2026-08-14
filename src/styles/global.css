@@ -442,9 +442,9 @@ body{
 
 .scanner-frame{
 
-  width:350px;
+  width:min(85vw,350px);
 
-  height:220px;
+  height:min(85vw,220px);
 
   border:3px solid white;
 
