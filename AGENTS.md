@@ -22,7 +22,7 @@
 ## Current project direction (QR pivot)
 
 - Project changing: create product QRs (text/JSON/table format) → scan → full nutrition info (kcal, protein, carbs, total sugars, dietary fibre, total fat, saturated fat, cholesterol, sodium) + price + image
-- **No Open Food Facts dependency** — own local product DB (SQLite), barcode generation = another team member's part
+- **Data source DECIDED (Discussion #31):** Open Food Facts **INDIA** (`in.openfoodfacts.org`), NOT global. Hybrid: local SQLite seeded from OFF India (~22K products) → live OFF IN API fallback → manual demo product entries. Scan both barcode AND QR. FSSAI has NO public API (FoSCoS captcha/encrypted; paid 3rd-party only) — never pursue FSSAI API. Barcodes contain only a numeric ID; nutrition/FSSAI data comes from DB lookup keyed by GTIN.
 - **AI = future only** (messenger: "good for diet / avoid")
 - Demo work exists in `demo/` folder: QR generation scripts, QR→table page, URL-table server
 - Scan feedback UX issue: #30 (trigger-based Scan button + success/fail feedback)
