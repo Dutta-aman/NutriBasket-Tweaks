@@ -86,13 +86,13 @@ function Checkout({
         <div className="payment-box">
 
           <div className="qr-placeholder">
-            ▦
+            <span className="qr-icon">🔒</span>
           </div>
 
-          <h3>Scan QR Code</h3>
+          <h3>Demo Payment</h3>
 
           <p>
-            Use any UPI app to complete your payment.
+            This is a demo — no real UPI QR. Tap Pay to simulate payment.
           </p>
 
         </div>

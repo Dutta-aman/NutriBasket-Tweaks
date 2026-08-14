@@ -8,7 +8,7 @@
 }
 
 .basket-card{
-    width:950px;
+    width:min(92vw,950px);
     background:rgba(255,255,255,.12);
     backdrop-filter:blur(18px);
     border:1px solid rgba(255,255,255,.15);

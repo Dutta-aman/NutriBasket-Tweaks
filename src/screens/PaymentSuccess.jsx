@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "./../styles/payment.css";
 
 function round2(n) { return Math.round(n * 100) / 100; }
@@ -13,10 +14,11 @@ function PaymentSuccess({
     0
   );
 
-  const transactionId =
-    "NB" + Math.floor(Math.random() * 100000000);
+  const [transactionId] = useState(
+    () => "NB" + Math.floor(Math.random() * 100000000)
+  );
 
-  const date = new Date().toLocaleString();
+  const [date] = useState(() => new Date().toLocaleString());
 
   return (
 
