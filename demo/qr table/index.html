@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriBasket QR Demo — Product Table</title>
+  <script src="/node_modules/@zxing/browser/umd/zxing-browser.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at top, #065f46, #022c22);
+      color: #fff; min-height: 100vh; padding: 16px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    h1 { font-size: 22px; margin: 8px 0 4px; }
+    p.hint { color: #a7f3d0; margin: 4px 0 16px; font-size: 14px; text-align: center; }
+    .panel {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px; padding: 16px; width: 100%; max-width: 480px;
+      backdrop-filter: blur(18px);
+    }
+    video, img { width: 100%; border-radius: 12px; background: #000; }
+    button {
+      background: #10b981; color: #022c22; border: 0; border-radius: 12px;
+      padding: 10px 16px; font-size: 15px; font-weight: 700; cursor: pointer; margin: 4px;
+    }
+    button.stop { background: #ef4444; color: #fff; }
+    .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; margin-top: 10px; }
+    #fileInput { color: #fff; margin: 10px auto 0; display: block; }
+    #result { display: none; margin-top: 12px; }
+    .product-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .name { font-size: 20px; font-weight: 800; }
+    .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .badge {
+      background: rgba(16,185,129,.25); border: 1px solid #10b981; color: #a7f3d0;
+      border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; background: rgba(0,0,0,.3); border-radius: 12px; overflow: hidden; }
+    th, td { border: 1px solid rgba(255,255,255,.25); padding: 9px 12px; text-align: left; font-size: 14px; }
+    th { background: #059669; }
+    td.value { font-weight: 700; text-align: right; }
+    .raw {
+      background: rgba(0,0,0,.35); border-radius: 10px; padding: 10px; margin-top: 10px;
+      font-family: monospace; font-size: 12px; white-space: pre-wrap; word-break: break-all;
+      max-height: 150px; overflow: auto;
+    }
+    .toast { color: #fbbf24; font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>NutriBasket QR → Product Table</h1>
+  <p class="hint">Scan product QR (camera or file) → shows a product card + nutrition table</p>
+
+  <div class="panel">
+    <video id="video" playsinline muted style="display:none"></video>
+    <div class="controls">
+      <button id="startBtn">Start Camera Scan</button>
+      <button id="stopBtn" class="stop" style="display:none">Stop Camera</button>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" />
+  </div>
+
+  <div id="result" class="panel">
+    <div class="product-head">
+      <span class="name" id="name"></span>
+      <div class="badges">
+        <span class="badge" id="brand" style="display:none"></span>
+        <span class="badge" id="price" style="display:none"></span>
+        <span class="badge" id="weight" style="display:none"></span>
+      </div>
+    </div>
+    <table id="table" style="display:none">
+      <thead><tr><th>Nutrient</th><th>Value</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div id="toast" class="toast"></div>
+    <div id="raw" class="raw" style="display:none"></div>
+  </div>
+
+  <script>
+    const video = document.getElementById("video");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const fileInput = document.getElementById("fileInput");
+    const result = document.getElementById("result");
+    const nameEl = document.getElementById("name");
+    const brandEl = document.getElementById("brand");
+    const priceEl = document.getElementById("price");
+    const weightEl = document.getElementById("weight");
+    const table = document.getElementById("table");
+    const tbody = table.querySelector("tbody");
+    const toast = document.getElementById("toast");
+    const raw = document.getElementById("raw");
+
+    const reader = new ZXing.BrowserQRCodeReader();
+    let controls = null;
+
+    function render(content) {
+      result.style.display = "block";
+      nameEl.textContent = "";
+      brandEl.style.display = "none";
+      priceEl.style.display = "none";
+      weightEl.style.display = "none";
+      tbody.innerHTML = "";
+      toast.textContent = "";
+      raw.style.display = "none";
+      table.style.display = "none";
+
+      let obj = null;
+      try { obj = JSON.parse(content); } catch (e) {}
+
+      if (obj && typeof obj === "object" && Array.isArray(obj.nutrition)) {
+        nameEl.textContent = obj.name || "Product";
+        if (obj.brand) { brandEl.textContent = obj.brand; brandEl.style.display = "inline-block"; }
+        if (obj.price) { priceEl.textContent = "₹" + obj.price; priceEl.style.display = "inline-block"; }
+        if (obj.weight) { weightEl.textContent = obj.weight; weightEl.style.display = "inline-block"; }
+        table.style.display = "table";
+        for (const [k, v] of obj.nutrition) {
+          const tr = document.createElement("tr");
+          const tdK = document.createElement("td"); tdK.textContent = k;
+          const tdV = document.createElement("td"); tdV.textContent = v; tdV.className = "value";
+          tr.appendChild(tdK); tr.appendChild(tdV);
+          tbody.appendChild(tr);
+        }
+        toast.textContent = "Decoded: " + content.length + " chars — JSON parsed successfully";
+      } else {
+        nameEl.textContent = "Not a product QR";
+        raw.style.display = "block";
+        raw.textContent = content;
+        toast.textContent = "This QR contains plain text. Product QR must contain JSON with a 'nutrition' array.";
+      }
+    }
+
+    startBtn.onclick = async () => {
+      try {
+        controls = await reader.decodeFromVideoDevice(undefined, video, (res, err) => {
+          if (res) {
+            render(res.getText());
+            stopScan();
+          }
+        });
+        video.style.display = "block";
+        startBtn.style.display = "none";
+        stopBtn.style.display = "inline-block";
+      } catch (e) {
+        alert("Camera error: " + e.message + "\nTip: use file upload instead.");
+      }
+    };
+
+    stopBtn.onclick = stopScan;
+    function stopScan() {
+      if (controls) { controls.stop(); controls = null; }
+      video.style.display = "none";
+      startBtn.style.display = "inline-block";
+      stopBtn.style.display = "none";
+    }
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await img.decode();
+      try {
+        const res = await reader.decodeFromImageElement(img);
+        render(res.getText());
+      } catch (err) {
+        alert("Could not decode QR from this image.");
+      }
+    };
+  </script>
+</body>
+</html>
