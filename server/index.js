@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import { getProductByBarcode, gtinCheckDigitValid } from "./lib/off.js";
+import { findInSeed } from "./lib/seed.js";
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.get("/", (req, res) => {
   res.json({
     service: "NutriBasket API",
     endpoints: ["/health", "/api/products/:barcode"],
+    data_license: "Open Database License 1.0 (ODbL) — © Open Food Facts contributors",
   });
 });
 
@@ -69,7 +71,7 @@ app.get("/api/products/:barcode", async (req, res) => {
   }
 
   try {
-    const product = await getProductByBarcode(barcode);
+    const product = findInSeed(barcode) || (await getProductByBarcode(barcode));
     if (!product) {
       return res.status(404).json({
         error: "product_not_found",

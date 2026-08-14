@@ -431,6 +431,20 @@ npm run build   # production build to dist/
 
 ---
 
+## Data & License
+
+Product and nutrition data comes from **Open Food Facts** (India mirror
+`in.openfoodfacts.org`), © Open Food Facts contributors, and is licensed under the
+[Open Database License 1.0 (ODbL)](https://opendatacommons.org/licenses/odbl/1-0/)
+— see [LICENSE-ODbL](./LICENSE-ODbL) for the full license text. The bundled seed
+database (`seed/demo.db`) is a snapshot of Open Food Facts data and is
+distributed under the same license.
+
+The API exposes this attribution in its root response as the
+`data_license` field, and the app footer credits the data source.
+
+---
+
 ## License
 
 No license file is present in the repository ("No license specified").
