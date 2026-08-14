@@ -80,9 +80,11 @@ function App() {
 
   }
 
-  function addProduct(product) {
+  function addProduct(product, priceOverride) {
 
-    const priced = { ...product, price: prices[product.id] || 0 };
+    const price = priceOverride ?? prices[product.id] ?? 0;
+
+    const priced = { ...product, price };
 
     const existing = basket.find(
       item => item.id === priced.id
