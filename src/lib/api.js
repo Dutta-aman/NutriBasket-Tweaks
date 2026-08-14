@@ -27,5 +27,9 @@ export async function fetchProductByBarcode(barcode) {
   }
   if (res.status === 404) return null;
   if (!res.ok) throw new Error(`Lookup failed (${res.status})`);
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    throw new Error(`Server returned non-JSON (${res.status})`);
+  }
   return res.json();
 }

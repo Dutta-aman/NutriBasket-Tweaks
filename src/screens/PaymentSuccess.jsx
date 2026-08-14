@@ -1,5 +1,7 @@
 import "./../styles/payment.css";
 
+function round2(n) { return Math.round(n * 100) / 100; }
+
 function PaymentSuccess({
   basket,
   onExit
@@ -62,7 +64,7 @@ function PaymentSuccess({
             </span>
 
             <span className="value">
-              ₹{total}
+              ₹{round2(total)}
             </span>
           </div>
 

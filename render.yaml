@@ -10,3 +10,5 @@ services:
     envVars:
       - key: CLIENT_ORIGIN
         value: https://nutri-basket-six.vercel.app
+      - key: NODE_ENV
+        value: production
