@@ -13,6 +13,12 @@ function ProductInfo({
 
   const priceInputValid = /^\d+(\.\d{1,2})?$/.test(priceInput.trim());
 
+  function fmt(value, suffix) {
+
+    return value === null || value === undefined ? "N/A" : `${value}${suffix}`;
+
+  }
+
   function handleAdd() {
 
     if (price === null) {
@@ -116,7 +122,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🔥 {product.calories}
+              🔥 {fmt(product.calories)}
             </h2>
 
             <span>
@@ -128,7 +134,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              💪 {product.protein}g
+              💪 {fmt(product.protein, "g")}
             </h2>
 
             <span>
@@ -140,7 +146,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🌾 {product.carbs}g
+              🌾 {fmt(product.carbs, "g")}
             </h2>
 
             <span>
@@ -152,7 +158,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🥑 {product.fat}g
+              🥑 {fmt(product.fat, "g")}
             </h2>
 
             <span>

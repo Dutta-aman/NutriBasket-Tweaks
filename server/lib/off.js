@@ -4,6 +4,7 @@ const BASE_URL = process.env.OFF_BASE_URL || "https://world.openfoodfacts.org";
 const USER_AGENT = "NutriBasket/1.0 (contact@nutribasket.app)";
 const TIMEOUT_MS = 10000;
 const VALID_LENGTHS = [8, 12, 13, 14];
+const NOT_FOUND = Symbol("not_found");
 
 export function gtinCheckDigitValid(barcode) {
   if (!/^\d{8,14}$/.test(barcode)) return false;
@@ -28,11 +29,18 @@ async function fetchWithRetry(url, attempts = 2) {
         headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
         signal: controller.signal,
       });
+      if (res.status === 404) return null;
       if (res.status === 503 && i < attempts - 1) {
         await new Promise((r) => setTimeout(r, 800 * (i + 1)));
         continue;
       }
       if (!res.ok) throw new Error(`Open Food Facts responded ${res.status}`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          `Open Food Facts returned non-JSON (${contentType || "no content-type"})`
+        );
+      }
       return await res.json();
     } catch (err) {
       lastError = err;
@@ -44,16 +52,16 @@ async function fetchWithRetry(url, attempts = 2) {
   throw lastError;
 }
 
-function numberOrZero(value) {
-  return typeof value === "number" && Number.isFinite(value) ? value : 0;
+function numberOrNull(value) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function pickFirst(...values) {
   for (const value of values) {
-    const n = numberOrZero(value);
-    if (n > 0) return n;
+    const n = numberOrNull(value);
+    if (n !== null) return n;
   }
-  return 0;
+  return null;
 }
 
 function normalizeProduct(code, data) {
@@ -77,10 +85,12 @@ function normalizeProduct(code, data) {
 
 export async function getProductByBarcode(barcode) {
   const cached = get(barcode);
+  if (cached === NOT_FOUND) return null;
   if (cached) return cached;
   const url = `${BASE_URL}/api/v2/product/${barcode}.json?fields=code,product_name,brands,image_front_url,image_url,quantity,nutriments`;
   const data = await fetchWithRetry(url);
   const product = normalizeProduct(barcode, data);
   if (product) set(barcode, product);
+  else set(barcode, NOT_FOUND);
   return product;
 }

@@ -151,6 +151,10 @@ function App() {
 
     setLookup("idle");
 
+    setPrices({});
+
+    setLastBarcode(null);
+
     setPage("home");
 
   }
