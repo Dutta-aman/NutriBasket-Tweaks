@@ -45,11 +45,6 @@ function rateLimit(limitPerMinute) {
     next();
   };
 }
-
-app.use("/api", (req, res, next) => {
-  next();
-});
-
 app.get("/", (req, res) => {
   res.json({
     service: "NutriBasket API",

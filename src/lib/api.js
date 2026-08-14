@@ -1,4 +1,3 @@
-// issue #24: strip trailing slashes so /api/... joins cleanly
 const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
 const TIMEOUT_MS = 60000;
