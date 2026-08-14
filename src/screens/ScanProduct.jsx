@@ -72,6 +72,8 @@ function ScanProduct({ onProduct }) {
 
             maxLength="14"
 
+            aria-label="Barcode"
+
             placeholder="Or enter barcode manually…"
 
             value={manualCode}
