@@ -26,7 +26,7 @@ function PaymentSuccess({
 
       <div className="success-card">
 
-        <div className="success-icon">
+        <div className="success-icon" role="img" aria-label="Success">
           ✅
         </div>
 

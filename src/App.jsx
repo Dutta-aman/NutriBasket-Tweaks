@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Welcome from "./screens/Welcome";
 import Home from "./screens/Home";
@@ -25,6 +25,8 @@ function App() {
 
   const [slowLookup, setSlowLookup] = useState(false);
 
+  const lookupSeqRef = useRef(0);
+
   useEffect(() => {
 
     if (lookup !== "loading") {
@@ -48,9 +50,13 @@ function App() {
 
     setPage("product");
 
+    const seq = ++lookupSeqRef.current;
+
     fetchProductByBarcode(barcode)
 
       .then((product) => {
+
+        if (seq !== lookupSeqRef.current) return;
 
         if (!product) {
 
@@ -67,6 +73,8 @@ function App() {
       })
 
       .catch(() => {
+
+        if (seq !== lookupSeqRef.current) return;
 
         setLookup("error");
 
@@ -245,12 +253,14 @@ function App() {
               >
                 ← Back
               </button>
-              <button
-                className="start-btn premium-btn"
-                onClick={() => handleScanned(lastBarcode)}
-              >
-                🔄 Retry
-              </button>
+              {lastBarcode && (
+                <button
+                  className="start-btn premium-btn"
+                  onClick={() => handleScanned(lastBarcode)}
+                >
+                  🔄 Retry
+                </button>
+              )}
             </div>
           </div>
         </div>

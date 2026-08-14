@@ -95,6 +95,8 @@ function ProductInfo({
 
                 step="0.5"
 
+                aria-label="Price in rupees"
+
                 placeholder="₹"
 
                 value={priceInput}
