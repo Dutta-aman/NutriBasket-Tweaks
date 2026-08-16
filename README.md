@@ -1,3 +1,5 @@
+![NutriBasket Banner](assets/banner.svg)
+
 # NutriBasket
 
 NutriBasket — scan product barcodes or QR codes to get nutrition info (calories, protein, carbs, fat) for Indian products.
