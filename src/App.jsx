@@ -6,6 +6,7 @@ import ScanProduct from "./screens/ScanProduct";
 import ProductInfo from "./screens/ProductInfo";
 import Basket from "./screens/Basket";
 import { fetchProductByBarcode } from "./lib/api";
+import { extractBarcodeFromQr } from "./lib/barcode";
 
 function App() {
 
@@ -24,6 +25,21 @@ function App() {
   const [slowLookup, setSlowLookup] = useState(false);
 
   const lookupSeqRef = useRef(0);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const raw = params.get("product") ?? params.get("barcode") ?? params.get("code") ?? params.get("gtin") ?? params.get("ean") ?? params.get("id");
+    const barcode = raw ? extractBarcodeFromQr(raw) : null;
+    if (barcode) {
+      handleScanned(barcode);
+      const url = new URL(window.location.href);
+      for (const key of ["product", "barcode", "code", "gtin", "ean", "id"]) {
+        url.searchParams.delete(key);
+      }
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
 
@@ -163,7 +179,6 @@ function App() {
 
     return (
       <Home
-        basket={basket}
         onScan={() => setPage("scan")}
         onBasket={() => setPage("basket")}
       />

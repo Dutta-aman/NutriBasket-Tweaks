@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserMultiFormatReader, BrowserCodeReader } from "@zxing/browser";
 import { gtinCheckDigitValid, extractBarcodeFromQr, isPaymentQR } from "../../lib/barcode";
-import { ScanIcon } from "../icons";
+import { ScanIcon, CameraIcon, CheckIcon } from "../icons";
 
 const STATUS_TEXT = {
   idle: "Tap Scan Now to begin",
   starting: "Starting camera…",
   scanning: "Ready to Scan",
-  detected: "✅ Barcode captured — looking up…",
-  "qr-detected": "✅ Product QR captured — looking up…",
+  detected: "Scan success",
+  "qr-detected": "Scan success",
   denied: "Camera access blocked",
   "no-camera": "No camera found",
   busy: "Camera is busy",
   error: "Camera failed to start",
-  invalid: "✗ Not a valid product barcode — try again",
-  payment: "✗ Payment not available in app",
+  invalid: "Not a valid product barcode — try again",
+  payment: "Payment not available in app",
 };
 
 function BarcodeScanner({ onDetected }) {
@@ -131,16 +131,20 @@ function BarcodeScanner({ onDetected }) {
           <div className="scan-corner bottom-right"></div>
           <div className="scan-line"></div>
           {status === "idle" && (
-            <div className="scanner-overlay">📸</div>
+            <div className="scanner-overlay">
+              <CameraIcon size={48} className="scanner-camera-icon" />
+            </div>
           )}
           {success && (
-            <div className="scanner-success">✓</div>
+            <div className="scanner-success">
+              <CheckIcon size={64} />
+            </div>
           )}
         </div>
       </div>
 
       <div className="scanner-status premium-status" role="status" aria-live="polite">
-        <span>{bad ? "🔴" : status === "starting" ? "⏳" : success ? "✅" : "🟢"}</span>
+        <span className={`status-dot status-${bad ? "bad" : status === "starting" ? "waiting" : success ? "ok" : "idle"}`} />
         {STATUS_TEXT[status]}
       </div>
 

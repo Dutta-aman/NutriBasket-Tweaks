@@ -582,9 +582,12 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 48px;
   opacity: 0.9;
   background: rgba(28, 25, 23, 0.3);
+}
+
+.scanner-camera-icon {
+  color: #ffffff;
 }
 
 .scanner-success {
@@ -593,8 +596,6 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 72px;
-  font-weight: 700;
   color: #ffffff;
   background: rgba(16, 185, 129, 0.88);
   animation: successPop 0.2s ease;
@@ -658,6 +659,30 @@ button {
   font-weight: 600;
   color: var(--text);
   font-size: 14px;
+}
+
+.status-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.status-idle {
+  background: var(--emerald-500);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.status-dot.status-waiting {
+  background: var(--warning);
+}
+
+.status-dot.status-ok {
+  background: var(--emerald-500);
+}
+
+.status-dot.status-bad {
+  background: var(--danger);
 }
 
 .scan-help {
@@ -769,7 +794,10 @@ button {
 }
 
 .nutrition-grid h2 {
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
   margin-bottom: 6px;
   color: var(--text);
 }
@@ -777,6 +805,9 @@ button {
 .nutrition-grid span {
   color: var(--text-muted);
   font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .premium-nutrition h2 {

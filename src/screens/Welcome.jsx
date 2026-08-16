@@ -106,8 +106,6 @@ function Welcome({ onStart }) {
 
         </p>
 
-
-
         <div className="botanical-row">
           <AppleIcon size={24} />
           <BroccoliIcon size={24} />
@@ -115,6 +113,46 @@ function Welcome({ onStart }) {
           <BananaIcon size={24} />
           <TomatoIcon size={24} />
         </div>
+
+        <div className="section-divider" />
+
+        <div className="store-info premium-info">
+
+          <div>
+
+            <span className="store-icon">📅</span>
+
+            <p>
+              {today}
+            </p>
+
+          </div>
+
+
+
+          <div>
+
+            <span className="store-icon">🕒</span>
+
+            <p>
+              {time}
+            </p>
+
+          </div>
+
+        </div>
+
+        <button
+
+          className="start-btn premium-btn"
+
+          onClick={onStart}
+
+        >
+
+          Get Started
+
+        </button>
 
         <div className="section-divider" />
 
@@ -158,68 +196,6 @@ function Welcome({ onStart }) {
 
 
         </div>
-
-
-
-
-
-        <div className="store-info premium-info">
-
-
-          <div>
-
-            <span className="store-icon">🏪</span>
-
-            <p>
-              FreshMart Store
-            </p>
-
-          </div>
-
-
-
-          <div>
-
-            <span className="store-icon">📅</span>
-
-            <p>
-              {today}
-            </p>
-
-          </div>
-
-
-
-          <div>
-
-            <span className="store-icon">🕒</span>
-
-            <p>
-              {time}
-            </p>
-
-          </div>
-
-
-        </div>
-
-
-
-
-
-        <button
-
-          className="start-btn premium-btn"
-
-          onClick={onStart}
-
-        >
-
-          Get Started
-
-        </button>
-
-
 
       </div>
 
