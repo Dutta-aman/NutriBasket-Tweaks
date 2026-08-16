@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./../styles/payment.css";
+import { CheckIcon } from "../components/icons";
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -27,7 +28,7 @@ function PaymentSuccess({
       <div className="success-card">
 
         <div className="success-icon" role="img" aria-label="Success">
-          ✅
+          <CheckIcon size={48} />
         </div>
 
         <h1>

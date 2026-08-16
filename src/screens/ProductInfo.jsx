@@ -1,5 +1,7 @@
 import { useState } from "react";
 import "./../styles/global.css";
+import { CaloriesIcon, ProteinIcon, CarbsIcon, FatIcon, ProductIcon } from "../components/icons";
+import BotanicalBackground from "../components/BotanicalBackground";
 
 function ProductInfo({
   product,
@@ -42,6 +44,7 @@ function ProductInfo({
   return (
 
     <div className="product-container">
+      <BotanicalBackground />
 
       <div className="product-card premium-product">
 
@@ -59,7 +62,9 @@ function ProductInfo({
 
             <div className="product-image premium-product-icon">
 
-              🛒
+              <ProductIcon size={44} />
+
+              <span className="product-image-caption">No photo</span>
 
             </div>
 
@@ -124,7 +129,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🔥 {fmt(product.calories)}
+              <CaloriesIcon size={18} /> {fmt(product.calories)}
             </h2>
 
             <span>
@@ -136,7 +141,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              💪 {fmt(product.protein, "g")}
+              <ProteinIcon size={18} /> {fmt(product.protein, "g")}
             </h2>
 
             <span>
@@ -148,7 +153,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🌾 {fmt(product.carbs, "g")}
+              <CarbsIcon size={18} /> {fmt(product.carbs, "g")}
             </h2>
 
             <span>
@@ -160,7 +165,7 @@ function ProductInfo({
           <div>
 
             <h2>
-              🥑 {fmt(product.fat, "g")}
+              <FatIcon size={18} /> {fmt(product.fat, "g")}
             </h2>
 
             <span>
