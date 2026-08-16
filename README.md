@@ -4,15 +4,14 @@
 
 NutriBasket — scan product barcodes or QR codes to get nutrition info (calories, protein, carbs, fat) for Indian products.
 
-A final-year student project: point your phone camera at any packaged product, and NutriBasket returns its nutrition facts, lets you enter the price, and builds a nutrition-aware basket for checkout (prices in INR).
+A final-year student project: point your phone camera at any packaged product, and NutriBasket returns its nutrition facts and builds a nutrition-aware basket for checkout.
 
 ## Features
 
-- **Camera barcode + QR scanning** — live feed decoded with ZXing (`@zxing/browser`), with success/failure feedback and a retry option; handles camera permission denial, missing camera, and busy camera gracefully. QR codes are decoded and the embedded GTIN (bare digits, URL, JSON, or GS1 format) is extracted so the product's nutrition info can be shown; payment QR codes (UPI/PayTM/GPay) are detected and rejected with "Payment not available in app"
-- **QR deep links** — product QR codes encode the site URL (`https://nutribasket-tweaks.vercel.app/?product=<barcode>`), so scanning one with any phone camera opens the app straight on that product's nutrition page (a `?product=` / `?barcode=` / `?code=` / `?gtin=` / `?ean=` / `?id=` query parameter or `/product/<barcode>` path is supported); see `demo/make-qr-test.js` to generate them
+- **Camera barcode + QR scanning** — live camera feed decoded with ZXing (`@zxing/browser`) on the Scan page; payment QR codes are detected and rejected, and a manual numeric entry form covers scan failures (see Scanning Flows)
+- **QR deep links** — scanning a product QR with any phone camera opens the site straight on that product's nutrition page (see Scanning Flows)
 - **GTIN check-digit validation** — every barcode is validated client-side and re-validated by the server before a lookup is attempted
 - **Manual barcode entry** — a numeric fallback form for when scanning fails (poor lighting, damaged barcode, no camera)
-- **Price entry** — Open Food Facts carries no price data, so the user enters the INR price; prices are remembered for the session
 - **Basket** — quantity controls, remove items, per-item nutrition, running totals for calories, protein, carbs, and fat, plus the total bill
 - **Checkout (demo payment flow)** — order summary with a simulated UPI payment screen
 - **Payment success receipt** — receipt page with a generated transaction ID
@@ -48,12 +47,50 @@ A final-year student project: point your phone camera at any packaged product, a
 
 The frontend is a static Vite build served by Vercel. When a barcode is scanned or typed in, the app calls `GET /api/products/:barcode` on the Render-hosted Express API. The server first looks the code up in the bundled SQLite seed database — no network involved, so the most common products answer fast. If the code is not in the seed, the server queries the Open Food Facts India mirror (`in.openfoodfacts.org`), normalizes the response, and caches it in memory for 24 hours.
 
+## Scanning Flows
+
+There are three ways to reach a product page:
+
+**1. In-app scanner** — the Scan page opens a live camera feed decoded with ZXing (`@zxing/browser`). Point it at a barcode or a product QR code: QR content is parsed by `extractBarcodeFromQr` (`src/lib/barcode.js`), which understands bare GTIN digits, website URLs, JSON payloads, and GS1-style text. Payment QR codes (UPI/PayTM/GPay/PhonePe/BHIM) are detected and rejected with "Payment not available in app". Scanning failures — poor lighting, damaged barcode, camera permission denied, missing or busy camera — are handled gracefully with success/failure feedback and a retry option. A manual numeric entry form is the fallback; every code passes a GTIN check-digit validation client-side and again server-side before a lookup is attempted.
+
+**2. QR deep-links** — product QR codes encode the live site URL plus the GTIN (`https://nutribasket-tweaks.vercel.app/?product=<gtin>`). Scanning one with a stock phone camera opens the site and lands directly on that product's nutrition page. The URL parser accepts `?product=` as well as `?barcode=`, `?code=`, `?gtin=`, `?ean=`, `?id=`, and `?p=` query parameters, plus `/product/<gtin>` paths. `demo/make-qr-test.js` generates such QRs.
+
+**3. Pretty path URLs** — any 8–14 digit GTIN works as a bare URL path, e.g. `https://nutribasket-tweaks.vercel.app/8901764032912`. A Vercel rewrite (`vercel.json`, `/:gtin(\d{8,14})`) routes the path to the app, which resolves the code in the seed database first and falls back to Open Food Facts India. Codes found in neither show the "Product Not Found" screen, with Open Food Facts and Google search links for that code.
+
+**Platform limitation** — a stock phone camera cannot open a website from a plain EAN-13 barcode: the barcode encodes digits only, and mobile operating systems have no way to map digits to a URL. EAN-13 barcodes must therefore be scanned inside the app. QR codes are the only code type that can deep-link from a physical product.
+
+## Screens
+
+- **Welcome** — landing card with a Get Started button that enters the app
+- **Home** — dashboard with an Active Shopping Session indicator and two actions: Scan Product and My Basket
+- **Scanner** — live camera feed with a manual barcode entry fallback (see Scanning Flows)
+- **Product** — product photo, nutrition grid with calories, protein, carbs, and fat set in the Playfair Display font, and Add to Basket. While the lookup runs, a dither-grain animation plays; after ~5 seconds a hint appears for cold starts ("Waking up the server — this is normal for the free-tier backend…"). Unknown codes show the Product Not Found screen
+- **Basket** — quantity controls, remove items, per-item nutrition, running totals for calories, protein, carbs, and fat, and the total bill
+- **Checkout** — order summary with a simulated UPI payment screen
+- **Payment receipt** — receipt with a generated transaction ID
+
+## Demo Codes
+
+Two scripts generate test codes from the top 10 products in `seed/demo.db` (ordered by most-scanned):
+
+- `demo/make-qr-test.js` → `qr_test/` — 10 product QR codes. Each QR encodes the live site URL plus the product's GTIN (`https://nutribasket-tweaks.vercel.app/?product=<barcode>`), so a phone camera scan opens the site directly on that product's nutrition page
+- `demo/make-barcode-test.js` → `barcode_test/` — 10 EAN-13 barcode PNGs, rendered with bwip-js (a root devDependency) for testing the in-app scanner
+
+```bash
+node demo/make-qr-test.js
+node demo/make-barcode-test.js
+```
+
+Set `APP_URL` to test against a different frontend (e.g. `APP_URL=http://localhost:5173 node demo/make-qr-test.js`).
+
 ## Live Deployments
 
 | Target | URL |
 | --- | --- |
 | Frontend | https://nutribasket-tweaks.vercel.app |
 | Backend API | https://nutribasket-api.onrender.com (health check at `/health`) |
+
+Pushing to `main` auto-deploys: `.github/workflows/render-deploy.yml` triggers a Render deploy (via the Render API) and a production Vercel deployment (via the Vercel API).
 
 ## Getting Started
 
@@ -159,15 +196,6 @@ python3 scripts/make_csv_seed.py en.openfoodfacts.org.products.csv.gz 500 seed/d
 
 `scripts/make_csv_seed.py` streams the gzipped dump in one pass (~5 minutes), keeps rows tagged `en:india` that have energy data, sorts by most-scanned first, and writes up to `limit` rows (default 500) into `out.db` (default `seed/demo.db`).
 
-## Screens
-
-- **Home** — overview with stat cards (products, bill, calories, protein, carbs, fat) and quick links to Scan / Basket / Checkout
-- **Scan Product** — camera scanner for barcodes and product QR codes, with manual barcode entry fallback, success/failure feedback
-- **Product Info** — product photo, nutrition grid, price entry, Add to Basket
-- **Basket** — quantity controls, per-item nutrition, running totals
-- **Checkout** — order summary with a simulated UPI payment screen
-- **Payment Success** — receipt with a generated transaction ID
-
 ## Project Structure
 
 ```
@@ -175,8 +203,8 @@ NutriBasket_Tweaks/
 ├── src/                      # React frontend (Vite)
 │   ├── App.jsx               # screen routing, scan flow, basket state
 │   ├── components/           # BarcodeScanner (ZXing), ErrorBoundary, layout
-│   ├── lib/                  # api.js (fetch client), barcode.js (GTIN check)
-│   ├── screens/              # Home, ScanProduct, ProductInfo, Basket, ...
+│   ├── lib/                  # api.js (fetch client), barcode.js (GTIN check, QR parsing)
+│   ├── screens/              # Welcome, Home, ScanProduct, ProductInfo, Basket, ...
 │   └── styles/               # plain CSS, emerald theme
 ├── server/                   # Express backend
 │   ├── index.js              # routes, rate limiting, GTIN validation
@@ -188,21 +216,14 @@ NutriBasket_Tweaks/
 ├── .github/workflows/
 │   └── render-deploy.yml     # auto-deploy to Render + Vercel on push to main
 ├── render.yaml               # Render Blueprint (rootDir: server)
-├── vercel.json               # Vercel framework config (vite)
+├── vercel.json               # Vite framework config + /:gtin pretty-path rewrite
 ├── demo/
-│   └── make-qr-test.js       # generate product QR codes from the seed DB
+│   ├── make-qr-test.js       # 10 product QRs → qr_test/
+│   └── make-barcode-test.js  # 10 EAN-13 PNGs → barcode_test/ (bwip-js)
+├── qr_test/                  # generated product QR codes
+├── barcode_test/             # generated EAN-13 barcodes
 └── package.json              # frontend project (root)
 ```
-
-## Demo QR Codes
-
-`demo/make-qr-test.js` reads the top 10 products from `seed/demo.db` and writes scannable QR PNGs into `qr_test/`. Each QR encodes the live site URL plus the product's GTIN (`https://nutribasket-tweaks.vercel.app/?product=<barcode>`), so a phone camera scan opens the site directly on that product's nutrition page:
-
-```bash
-node demo/make-qr-test.js
-```
-
-Set `APP_URL` to test against a different frontend (e.g. `APP_URL=http://localhost:5173 node demo/make-qr-test.js`).
 
 ## Data & License
 
@@ -214,6 +235,7 @@ Nutrition data comes from **Open Food Facts**, © Open Food Facts contributors, 
 
 - **Seed coverage** — the demo seed holds 500 products; the full Indian catalogue on Open Food Facts is ~22,000 products, of which only ~1,800 have complete nutrition data. Shipping the full nutrition-complete set as a second seed is planned.
 - **Cold starts** — Render's free tier sleeps after ~15 minutes of inactivity; the first request after an idle period can take ~30 seconds to wake the service.
-- **No accounts** — prices and baskets live only in the current browser session; there are no users and no persistence.
+- **No accounts** — baskets live only in the current browser session; there are no users and no persistence.
 - **Demo payments** — checkout shows a simulated UPI screen and a generated transaction ID; no real money moves.
+- **Barcode deep-links** — plain EAN-13 barcodes cannot open the app from a stock camera; only QR codes deep-link (see Scanning Flows).
 - **Roadmap ideas** — full India seed, automated tests, basket/scan-history persistence, real payment integration, AI-based nutrition guidance.

@@ -29,14 +29,15 @@ function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("product") ?? params.get("barcode") ?? params.get("code") ?? params.get("gtin") ?? params.get("ean") ?? params.get("id");
-    const barcode = raw ? extractBarcodeFromQr(raw) : null;
+    const pathMatch = window.location.pathname.match(/^\/(\d{8,14})$/);
+    const barcode = (raw ? extractBarcodeFromQr(raw) : null) ?? (pathMatch ? extractBarcodeFromQr(pathMatch[1]) : null);
     if (barcode) {
       handleScanned(barcode);
       const url = new URL(window.location.href);
       for (const key of ["product", "barcode", "code", "gtin", "ean", "id"]) {
         url.searchParams.delete(key);
       }
-      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+      window.history.replaceState({}, "", pathMatch ? "/" : url.pathname + url.search + url.hash);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -221,6 +222,24 @@ function App() {
           <div className="product-card">
             <h1>Product Not Found</h1>
             <p>This barcode is not in the nutrition database.</p>
+            {lastBarcode && (
+              <div className="notfound-links">
+                <a
+                  href={`https://in.openfoodfacts.org/search?q=${encodeURIComponent(lastBarcode)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Search Open Food Facts
+                </a>
+                <a
+                  href={`https://www.google.com/search?q=${encodeURIComponent(lastBarcode)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Search Google
+                </a>
+              </div>
+            )}
             <button
               className="start-btn premium-btn"
               onClick={() => setPage("scan")}

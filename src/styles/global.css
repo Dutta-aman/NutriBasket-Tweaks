@@ -1184,3 +1184,23 @@ body {
   margin-top: 20px;
   width: 100%;
 }
+
+/* ================= Not Found Fallback Links ================= */
+
+.notfound-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+}
+
+.notfound-links a {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.notfound-links a:hover {
+  text-decoration: underline;
+}

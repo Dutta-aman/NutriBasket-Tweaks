@@ -1,3 +1,9 @@
 {
-  "framework": "vite"
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/:gtin(\\d{8,14})",
+      "destination": "/index.html"
+    }
+  ]
 }
