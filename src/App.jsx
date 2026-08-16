@@ -5,8 +5,6 @@ import Home from "./screens/Home";
 import ScanProduct from "./screens/ScanProduct";
 import ProductInfo from "./screens/ProductInfo";
 import Basket from "./screens/Basket";
-import Checkout from "./screens/Checkout";
-import PaymentSuccess from "./screens/PaymentSuccess";
 import { fetchProductByBarcode } from "./lib/api";
 
 function App() {
@@ -151,22 +149,6 @@ function App() {
 
   }
 
-  function handleExit() {
-
-    setBasket([]);
-
-    setSelectedProduct(null);
-
-    setLookup("idle");
-
-    setPrices({});
-
-    setLastBarcode(null);
-
-    setPage("home");
-
-  }
-
   if (page === "welcome") {
 
     return (
@@ -184,7 +166,6 @@ function App() {
         basket={basket}
         onScan={() => setPage("scan")}
         onBasket={() => setPage("basket")}
-        onCheckout={() => setPage("checkout")}
       />
     );
 
@@ -294,29 +275,6 @@ function App() {
         setBasket={setBasket}
         updateQuantity={updateQuantity}
         onContinue={() => setPage("home")}
-        onCheckout={() => setPage("checkout")}
-      />
-    );
-
-  }
-
-  if (page === "checkout") {
-
-    return (
-      <Checkout
-        basket={basket}
-        onPayment={() => setPage("success")}
-      />
-    );
-
-  }
-
-  if (page === "success") {
-
-    return (
-      <PaymentSuccess
-        basket={basket}
-        onExit={handleExit}
       />
     );
 

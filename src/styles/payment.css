@@ -1,110 +1,112 @@
-.success-container{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:40px;
-    background:radial-gradient(circle at top,#065F46,#022C22 65%);
+/* ================= Payment Success — Gem & Earth theme ================= */
+
+.success-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
 }
 
-.success-card{
-    width:min(92vw,700px);
-    background:rgba(255,255,255,.12);
-    backdrop-filter:blur(20px);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:30px;
-    padding:45px;
-    color:white;
-    text-align:center;
-    box-shadow:0 20px 45px rgba(0,0,0,.35);
+.success-card {
+  width: min(92vw, 480px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  color: var(--text);
+  text-align: center;
+  box-shadow: var(--shadow-card);
 }
 
-.success-icon{
-    width:110px;
-    height:110px;
-    margin:0 auto 25px;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:60px;
-    background:var(--primary);
-    box-shadow:0 0 25px rgba(16,185,129,.5);
+.success-icon {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 48px;
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
 }
 
-.success-card h1{
-    font-size:40px;
-    margin-bottom:12px;
+.success-card h1 {
+  font-size: 28px;
+  margin-bottom: 12px;
 }
 
-.success-card p{
-    opacity:.9;
-    margin-bottom:25px;
+.success-card p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
 }
 
-.verification-box{
-    background:rgba(255,255,255,.08);
-    border-radius:22px;
-    padding:28px;
-    text-align:left;
-    margin:30px 0;
+.verification-box {
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  text-align: left;
+  margin: 24px 0;
 }
 
-.verification-row{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 0;
-    border-bottom:1px solid rgba(255,255,255,.1);
+.verification-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
 }
 
-.verification-row:last-child{
-    border-bottom:none;
+.verification-row:last-child {
+  border-bottom: none;
 }
 
-.label{
-    color:var(--text-muted);
-    font-size:16px;
+.label {
+  color: var(--text-muted);
+  font-size: 14px;
 }
 
-.value{
-    font-size:18px;
-    font-weight:700;
-    color:white;
+.value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-mono);
 }
 
-.success-btn{
-    width:100%;
-    padding:18px;
-    border:none;
-    border-radius:16px;
-    background:var(--primary);
-    color:white;
-    font-size:20px;
-    font-weight:700;
-    cursor:pointer;
-    transition:.3s;
+.success-btn {
+  width: 100%;
+  padding: 18px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
 }
 
-.success-btn:hover{
-    background:var(--primary-dark);
-    transform:translateY(-2px);
+.success-btn:hover {
+  background: var(--primary-dark);
+  box-shadow: var(--shadow-cta);
 }
 
-@media(max-width:768px){
+@media (max-width: 768px) {
+  .success-card {
+    width: 100%;
+    padding: 24px;
+  }
 
-    .success-card{
-        width:100%;
-        padding:28px;
-    }
+  .success-card h1 {
+    font-size: 24px;
+  }
 
-    .success-card h1{
-        font-size:30px;
-    }
-
-    .verification-row{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:6px;
-    }
+  .verification-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }

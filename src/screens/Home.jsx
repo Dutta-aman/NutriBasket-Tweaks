@@ -1,10 +1,11 @@
 import "./../styles/global.css";
+import { BasketIcon, CaloriesIcon, ProteinIcon, CarbsIcon, FatIcon, ScanIcon, LeafIcon } from "../components/icons";
+import BotanicalBackground from "../components/BotanicalBackground";
 
 
 function Home({ 
   onScan, 
   onBasket, 
-  onCheckout,
   basket 
 }) {
 
@@ -54,17 +55,15 @@ function Home({
   return (
 
     <div className="home-container">
+      <BotanicalBackground />
 
-
-      <div className="home-card premium-home">
+      <div className="home-card premium-home dither-overlay">
 
 
 
         <div className="dashboard-header">
 
-          <h1>
-            🛒 NutriBasket
-          </h1>
+          <h1><LeafIcon size={24} className="inline-icon" /> NutriBasket</h1>
 
 
           <p>
@@ -81,7 +80,7 @@ function Home({
 
 
           <span>
-            🟢 Active Shopping Session
+            <span className="session-dot" /> Active Shopping Session
           </span>
 
 
@@ -103,7 +102,7 @@ function Home({
           <div className="dashboard-card nutrition-card">
 
             <div className="card-icon">
-              🛍
+              <BasketIcon size={24} />
             </div>
 
             <h2>
@@ -123,7 +122,7 @@ function Home({
           <div className="dashboard-card nutrition-card bill-card">
 
             <div className="card-icon">
-              💰
+              <ScanIcon size={24} />
             </div>
 
             <h2>
@@ -143,7 +142,7 @@ function Home({
           <div className="dashboard-card nutrition-card calorie-card">
 
             <div className="card-icon">
-              🔥
+              <CaloriesIcon size={24} />
             </div>
 
             <h2>
@@ -163,7 +162,7 @@ function Home({
           <div className="dashboard-card nutrition-card">
 
             <div className="card-icon">
-              💪
+              <ProteinIcon size={24} />
             </div>
 
             <h2>
@@ -183,7 +182,7 @@ function Home({
           <div className="dashboard-card nutrition-card">
 
             <div className="card-icon">
-              🌾
+              <CarbsIcon size={24} />
             </div>
 
             <h2>
@@ -203,7 +202,7 @@ function Home({
           <div className="dashboard-card nutrition-card">
 
             <div className="card-icon">
-              🥑
+              <FatIcon size={24} />
             </div>
 
             <h2>
@@ -248,23 +247,6 @@ function Home({
           >
 
             🧺 My Basket
-
-          </button>
-
-
-
-
-          <button
-
-            className="start-btn"
-
-            disabled={basket.length===0}
-
-            onClick={onCheckout}
-
-          >
-
-            💳 Checkout
 
           </button>
 
