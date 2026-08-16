@@ -41,3 +41,6 @@ dist-ssr
 
 # (not project code)
 skills-lock.json
+
+# (not project code)
+demo/
