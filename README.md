@@ -31,15 +31,15 @@ A final-year student project: point your phone camera at any packaged product, a
 ## Architecture
 
 ```
-┌───────────────┐   GET /api/products/:barcode   ┌───────────────────┐
+┌───────────────┐   GET /api/products/:barcode     ┌───────────────────┐
 │    Browser    │ ──────────────────────────────▶ │  Render backend   │
 │ (React + Vite │ ◀────────────────────────────── │   Express API     │
-│  on Vercel)   │         JSON response          └─────────┬─────────┘
+│  on Vercel)   │         JSON response            └─────────┬─────────┘
 └───────────────┘                                          │
                                     ┌───────────────────────┴──────────────┐
                                     ▼                                      ▼
                           ┌──────────────────┐    miss          ┌───────────────────────┐
-                          │  seed/demo.db    │ ───────────────▶ │  Open Food Facts      │
+                          │  seed/demo.db    │ ───────────────▶│  Open Food Facts      │
                           │  SQLite, 500     │                  │  in.openfoodfacts.org │
                           │  products        │                  └───────────────────────┘
                           └──────────────────┘

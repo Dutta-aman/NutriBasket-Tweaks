@@ -71,10 +71,10 @@ function Welcome({ onStart }) {
 
     <AppLayout>
 
-      <div className="welcome-card premium-welcome dither-overlay">
+      <div className="welcome-card premium-welcome pixel-reveal" style={{ "--d": "0.1s" }}>
 
 
-        <div className="brand-logo">
+        <div className="brand-logo pixel-reveal" style={{ "--d": "0.15s" }}>
           <LeafIcon size={48} className="brand-icon" />
         </div>
 
@@ -82,13 +82,23 @@ function Welcome({ onStart }) {
 
         <h1>
 
-          Nutri<span>Basket</span>
+          {"Nutri".split("").map((c, i) => (
+            <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.15s" }}>{c}</i>
+          ))}
+
+          <span>
+
+            {"Basket".split("").map((c, i) => (
+              <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.15s" }}>{c}</i>
+            ))}
+
+          </span>
 
         </h1>
 
 
 
-        <h2>
+        <h2 className="pixel-reveal" style={{ "--d": "0.15s" }}>
 
           Smart Shopping Assistant
 
@@ -96,15 +106,14 @@ function Welcome({ onStart }) {
 
 
 
-        <p className="welcome-text">
+        <p className="welcome-text pixel-reveal" style={{ "--d": "0.15s" }}>
 
           Experience smarter grocery shopping with
           real-time product scanning, nutrition tracking,
           and a curated basket of fresh produce.
 
         </p>
-
-        <div className="botanical-row">
+        <div className="botanical-row pixel-reveal" style={{ "--d": "0.15s" }}>
           <AppleIcon size={24} />
           <BroccoliIcon size={24} />
           <CarrotIcon size={24} />
@@ -112,9 +121,11 @@ function Welcome({ onStart }) {
           <TomatoIcon size={24} />
         </div>
 
-        <div className="section-divider" />
+        <div className="section-divider">
+          <LeafIcon size={14} />
+        </div>
 
-        <div className="store-info premium-info">
+        <div className="store-info premium-info pixel-reveal" style={{ "--d": "0.15s" }}>
 
           <div>
 
@@ -142,7 +153,9 @@ function Welcome({ onStart }) {
 
         <button
 
-          className="start-btn premium-btn"
+          className="start-btn premium-btn pixel-reveal"
+
+          style={{ "--d": "0.15s" }}
 
           onClick={onStart}
 
@@ -151,11 +164,12 @@ function Welcome({ onStart }) {
           Get Started
 
         </button>
+        <div className="section-divider">
+          <LeafIcon size={14} />
+        </div>
 
-        <div className="section-divider" />
 
-
-        <div className="feature-row premium-features">
+        <div className="feature-row premium-features pixel-reveal" style={{ "--d": "0.15s" }}>
 
 
           <div className="feature-card">
