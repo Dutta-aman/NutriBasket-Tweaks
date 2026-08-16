@@ -23,6 +23,7 @@ export function findInSeed(barcode) {
   const row = db.prepare("SELECT * FROM products WHERE barcode = ?").get(barcode);
   if (!row) return null;
   return {
+    id: row.barcode,
     name: row.product_name,
     brand: row.brands,
     barcode: row.barcode,

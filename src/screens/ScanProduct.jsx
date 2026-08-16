@@ -2,6 +2,8 @@ import { useState } from "react";
 import "./../styles/global.css";
 import BarcodeScanner from "./../components/scanner/BarcodeScanner";
 import { gtinCheckDigitValid } from "./../lib/barcode";
+import { ScanIcon } from "../components/icons";
+import BotanicalBackground from "../components/BotanicalBackground";
 
 function ScanProduct({ onProduct }) {
 
@@ -32,6 +34,7 @@ function ScanProduct({ onProduct }) {
   return (
 
     <div className="scan-container">
+      <BotanicalBackground />
 
       <div className="scan-card premium-scan">
 
@@ -39,7 +42,7 @@ function ScanProduct({ onProduct }) {
 
           <div className="scan-icon">
 
-            📷
+            <ScanIcon size={48} />
 
           </div>
 
@@ -51,7 +54,7 @@ function ScanProduct({ onProduct }) {
 
           <p>
 
-            Scan your product barcode to view
+            Scan a product barcode or QR code to view
             price and nutrition information.
 
           </p>
@@ -90,7 +93,7 @@ function ScanProduct({ onProduct }) {
 
           >
 
-            🔍 Look Up
+            Look Up
 
           </button>
 

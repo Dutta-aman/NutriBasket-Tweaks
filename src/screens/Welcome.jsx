@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import AppLayout from "../components/layout/AppLayout";
+import { ScanIcon, LeafIcon, HeartIcon, AppleIcon, BroccoliIcon, CarrotIcon, BananaIcon, TomatoIcon } from "../components/icons";
+import BotanicalBackground from "../components/BotanicalBackground";
 
 import "./../styles/global.css";
 
@@ -69,15 +71,13 @@ function Welcome({ onStart }) {
   return (
 
     <AppLayout>
+      <BotanicalBackground />
+
+      <div className="welcome-card premium-welcome dither-overlay">
 
 
-      <div className="welcome-card premium-welcome">
-
-
-        <div className="brand-logo animated-logo">
-
-          🛒
-
+        <div className="brand-logo">
+          <LeafIcon size={48} className="brand-icon" />
         </div>
 
 
@@ -102,11 +102,21 @@ function Welcome({ onStart }) {
 
           Experience smarter grocery shopping with
           real-time product scanning, nutrition tracking,
-          and seamless checkout.
+          and a curated basket of fresh produce.
 
         </p>
 
 
+
+        <div className="botanical-row">
+          <AppleIcon size={24} />
+          <BroccoliIcon size={24} />
+          <CarrotIcon size={24} />
+          <BananaIcon size={24} />
+          <TomatoIcon size={24} />
+        </div>
+
+        <div className="section-divider" />
 
 
         <div className="feature-row premium-features">
@@ -115,7 +125,7 @@ function Welcome({ onStart }) {
           <div className="feature-card">
 
             <strong>
-              ⚡
+              <ScanIcon size={32} />
             </strong>
 
             <span>
@@ -133,33 +143,15 @@ function Welcome({ onStart }) {
           <div className="feature-card">
 
             <strong>
-              🥗
+              <HeartIcon size={32} />
             </strong>
 
             <span>
-              Nutrition Info
+              Health Data
             </span>
 
             <small>
               Track calories & nutrients
-            </small>
-
-          </div>
-
-
-
-          <div className="feature-card">
-
-            <strong>
-              💳
-            </strong>
-
-            <span>
-              Easy Checkout
-            </span>
-
-            <small>
-              Fast digital payment
             </small>
 
           </div>
@@ -176,7 +168,7 @@ function Welcome({ onStart }) {
 
           <div>
 
-            🏪
+            <span className="store-icon">🏪</span>
 
             <p>
               FreshMart Store
@@ -188,7 +180,7 @@ function Welcome({ onStart }) {
 
           <div>
 
-            📅
+            <span className="store-icon">📅</span>
 
             <p>
               {today}
@@ -200,7 +192,7 @@ function Welcome({ onStart }) {
 
           <div>
 
-            🕒
+            <span className="store-icon">🕒</span>
 
             <p>
               {time}
@@ -223,7 +215,7 @@ function Welcome({ onStart }) {
 
         >
 
-          🛍 Start Shopping
+          Get Started
 
         </button>
 

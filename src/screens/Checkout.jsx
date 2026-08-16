@@ -1,4 +1,5 @@
 import "./../styles/checkout.css";
+import { CartIcon } from "../components/icons";
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -43,7 +44,7 @@ function Checkout({
 
       <div className="checkout-card">
 
-        <h1>💳 Checkout</h1>
+        <h1><CartIcon size={28} /> Checkout</h1>
 
         <p className="checkout-subtitle">
           Review your order before completing payment.
@@ -101,7 +102,7 @@ function Checkout({
           className="pay-btn"
           onClick={onPayment}
         >
-          💳 Pay ₹{round2(totalAmount)}
+          Pay ₹{round2(totalAmount)}
         </button>
 
       </div>
