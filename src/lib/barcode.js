@@ -42,6 +42,24 @@ export function extractBarcodeFromQr(text) {
     // not JSON — fall through
   }
 
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const url = new URL(trimmed);
+      for (const key of ["product", "barcode", "code", "gtin", "ean", "id", "p"]) {
+        const value = url.searchParams.get(key);
+        if (typeof value === "string" && gtinCheckDigitValid(value.trim())) {
+          return value.trim();
+        }
+      }
+      const pathMatch = url.pathname.match(/\/product\/([^/]+)/i);
+      if (pathMatch && gtinCheckDigitValid(pathMatch[1].trim())) {
+        return pathMatch[1].trim();
+      }
+    } catch {
+      // malformed URL — fall through to digit-run scan
+    }
+  }
+
   const stripped = trimmed.replace(/^\[?01\]?/, "");
   const runs = stripped.match(/\d{8,14}/g) ?? [];
   for (const run of runs) {

@@ -17,7 +17,9 @@ function ProductInfo({
 
   function fmt(value, suffix) {
 
-    return value === null || value === undefined ? "N/A" : `${value}${suffix}`;
+    const num = Number(value);
+
+    return Number.isFinite(num) ? `${num}${suffix ?? ""}` : "N/A";
 
   }
 
@@ -200,7 +202,7 @@ function ProductInfo({
 
           >
 
-            🧺 Add to Basket
+            Add to Basket
 
           </button>
 

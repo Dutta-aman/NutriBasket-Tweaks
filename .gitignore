@@ -38,3 +38,6 @@ dist-ssr
 
 # (not project code)
 .opencode/
+
+# (not project code)
+skills-lock.json
