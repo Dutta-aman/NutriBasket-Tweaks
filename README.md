@@ -9,6 +9,7 @@ A final-year student project: point your phone camera at any packaged product, a
 ## Features
 
 - **Camera barcode + QR scanning** — live feed decoded with ZXing (`@zxing/browser`), with success/failure feedback and a retry option; handles camera permission denial, missing camera, and busy camera gracefully. QR codes are decoded and the embedded GTIN (bare digits, URL, JSON, or GS1 format) is extracted so the product's nutrition info can be shown; payment QR codes (UPI/PayTM/GPay) are detected and rejected with "Payment not available in app"
+- **QR deep links** — product QR codes encode the site URL (`https://nutribasket-tweaks.vercel.app/?product=<barcode>`), so scanning one with any phone camera opens the app straight on that product's nutrition page (a `?product=` / `?barcode=` / `?code=` / `?gtin=` / `?ean=` / `?id=` query parameter or `/product/<barcode>` path is supported); see `demo/make-qr-test.js` to generate them
 - **GTIN check-digit validation** — every barcode is validated client-side and re-validated by the server before a lookup is attempted
 - **Manual barcode entry** — a numeric fallback form for when scanning fails (poor lighting, damaged barcode, no camera)
 - **Price entry** — Open Food Facts carries no price data, so the user enters the INR price; prices are remembered for the session
@@ -185,11 +186,23 @@ NutriBasket_Tweaks/
 ├── scripts/
 │   └── make_csv_seed.py      # builds demo.db from the OFF CSV dump
 ├── .github/workflows/
-│   └── render-deploy.yml     # auto-deploy to Render on push
+│   └── render-deploy.yml     # auto-deploy to Render + Vercel on push to main
 ├── render.yaml               # Render Blueprint (rootDir: server)
 ├── vercel.json               # Vercel framework config (vite)
+├── demo/
+│   └── make-qr-test.js       # generate product QR codes from the seed DB
 └── package.json              # frontend project (root)
 ```
+
+## Demo QR Codes
+
+`demo/make-qr-test.js` reads the top 10 products from `seed/demo.db` and writes scannable QR PNGs into `qr_test/`. Each QR encodes the live site URL plus the product's GTIN (`https://nutribasket-tweaks.vercel.app/?product=<barcode>`), so a phone camera scan opens the site directly on that product's nutrition page:
+
+```bash
+node demo/make-qr-test.js
+```
+
+Set `APP_URL` to test against a different frontend (e.g. `APP_URL=http://localhost:5173 node demo/make-qr-test.js`).
 
 ## Data & License
 
