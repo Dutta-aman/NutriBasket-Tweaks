@@ -36,8 +36,6 @@ function ScanProduct({ onProduct, onBack }) {
 
       <div className="scan-card premium-scan">
 
-        <button className="secondary-btn scan-back-btn" onClick={onBack}>← Back</button>
-
         <div className="scan-header">
 
           <div className="scan-icon">
@@ -108,6 +106,8 @@ function ScanProduct({ onProduct, onBack }) {
           </p>
 
         )}
+
+        <button className="secondary-btn scan-back-btn" onClick={onBack}>← Back</button>
 
       </div>
 

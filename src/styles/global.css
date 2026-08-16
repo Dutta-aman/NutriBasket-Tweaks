@@ -131,12 +131,38 @@ button {
   content: "";
   position: absolute;
   inset: 0;
-  opacity: 0.04;
+  opacity: 0.09;
   pointer-events: none;
   border-radius: inherit;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 128px 128px;
   mix-blend-mode: multiply;
+}
+
+.dither-anim {
+  width: 88px;
+  height: 88px;
+  margin: 0 auto 18px;
+  border-radius: 22px;
+  background-color: var(--surface-muted);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  opacity: 0.85;
+  animation: dither-shift 0.5s steps(4) infinite;
+}
+
+@keyframes dither-shift {
+  0% { background-position: 0 0; }
+  25% { background-position: 32px -16px; }
+  50% { background-position: -16px 24px; }
+  75% { background-position: 16px 8px; }
+  100% { background-position: 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dither-anim {
+    animation: none;
+  }
 }
 
 /* ================= Glass Header ================= */
@@ -1103,58 +1129,8 @@ button {
   50% { transform: translateY(-5px); }
 }
 
-/* ================= Botanical Background ================= */
-
-.botanical-bg {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-
-.botanical-float {
-  position: absolute;
-  animation: botanical-drift 6s ease-in-out infinite;
-  opacity: 0.5;
-  will-change: transform;
-}
-
-.botanical-float:nth-child(odd) {
-  animation-name: botanical-sway;
-  animation-duration: 5s;
-}
-
-.botanical-float:nth-child(3n) {
-  animation-name: botanical-flutter;
-  animation-duration: 4s;
-}
-
-@keyframes botanical-drift {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  25% { transform: translateY(-6px) rotate(3deg); }
-  50% { transform: translateY(-2px) rotate(-2deg); }
-  75% { transform: translateY(-8px) rotate(1deg); }
-}
-
-@keyframes botanical-sway {
-  0%, 100% { transform: translateX(0) translateY(0); }
-  33% { transform: translateX(4px) translateY(-5px); }
-  66% { transform: translateX(-3px) translateY(-3px); }
-}
-
-@keyframes botanical-flutter {
-  0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-  25% { transform: translateY(-4px) rotate(5deg) scale(1.05); }
-  50% { transform: translateY(-8px) rotate(-3deg) scale(0.98); }
-  75% { transform: translateY(-3px) rotate(2deg) scale(1.02); }
-}
-
 /* Reduced motion override */
 @media (prefers-reduced-motion: reduce) {
-  .botanical-float {
-    animation: none !important;
-  }
   .botanical-row svg {
     animation: none !important;
   }
@@ -1205,5 +1181,6 @@ body {
 }
 
 .scan-back-btn {
-  margin-bottom: 16px;
+  margin-top: 20px;
+  width: 100%;
 }

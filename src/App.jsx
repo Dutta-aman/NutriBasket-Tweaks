@@ -198,11 +198,14 @@ function App() {
       return (
         <div className="product-container">
           <div className="product-card">
+            <div className="dither-anim" aria-hidden="true" />
             <h1>Searching…</h1>
             <p>Fetching nutrition information.</p>
             {slowLookup && (
               <p className="lookup-hint">
-                Waking up the server — first request can take ~40s.
+                Waking up the server — this is normal for the free-tier
+                backend and can take up to ~40s on the first request.
+                Please wait…
               </p>
             )}
           </div>
