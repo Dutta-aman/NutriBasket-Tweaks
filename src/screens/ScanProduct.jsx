@@ -3,9 +3,8 @@ import "./../styles/global.css";
 import BarcodeScanner from "./../components/scanner/BarcodeScanner";
 import { gtinCheckDigitValid } from "./../lib/barcode";
 import { ScanIcon } from "../components/icons";
-import BotanicalBackground from "../components/BotanicalBackground";
 
-function ScanProduct({ onProduct }) {
+function ScanProduct({ onProduct, onBack }) {
 
   const [manualCode, setManualCode] = useState("");
 
@@ -34,9 +33,10 @@ function ScanProduct({ onProduct }) {
   return (
 
     <div className="scan-container">
-      <BotanicalBackground />
 
       <div className="scan-card premium-scan">
+
+        <button className="secondary-btn scan-back-btn" onClick={onBack}>← Back</button>
 
         <div className="scan-header">
 

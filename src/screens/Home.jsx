@@ -1,6 +1,5 @@
 import "./../styles/global.css";
 import { LeafIcon } from "../components/icons";
-import BotanicalBackground from "../components/BotanicalBackground";
 
 
 function Home({
@@ -11,7 +10,6 @@ function Home({
   return (
 
     <div className="home-container">
-      <BotanicalBackground />
 
       <div className="home-card premium-home dither-overlay">
 

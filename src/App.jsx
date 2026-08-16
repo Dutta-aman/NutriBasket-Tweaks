@@ -20,7 +20,7 @@ function App() {
 
   const [lookup, setLookup] = useState("idle");
 
-  const [prices, setPrices] = useState({});
+  const [prices] = useState({});
 
   const [slowLookup, setSlowLookup] = useState(false);
 
@@ -93,12 +93,6 @@ function App() {
         setLookup("error");
 
       });
-
-  }
-
-  function setPrice(barcode, price) {
-
-    setPrices((prev) => ({ ...prev, [barcode]: price }));
 
   }
 
@@ -191,6 +185,7 @@ function App() {
     return (
       <ScanProduct
         onProduct={handleScanned}
+        onBack={() => setPage("welcome")}
       />
     );
 
@@ -269,8 +264,6 @@ function App() {
       return (
         <ProductInfo
           product={selectedProduct}
-          price={prices[selectedProduct.id] ?? null}
-          onSetPrice={setPrice}
           onBack={() => setPage("scan")}
           onAdd={addProduct}
         />

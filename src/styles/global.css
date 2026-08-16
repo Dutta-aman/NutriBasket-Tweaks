@@ -796,7 +796,7 @@ button {
 .nutrition-grid h2 {
   font-size: 20px;
   font-weight: 600;
-  font-family: var(--font-display);
+  font-family: "Inter Tight", sans-serif;
   letter-spacing: 0.01em;
   margin-bottom: 6px;
   color: var(--text);
@@ -1202,4 +1202,8 @@ body {
 
 .welcome-card {
   padding: 40px 24px;
+}
+
+.scan-back-btn {
+  margin-bottom: 16px;
 }

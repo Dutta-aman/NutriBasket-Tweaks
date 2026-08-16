@@ -1,19 +1,11 @@
-import { useState } from "react";
 import "./../styles/global.css";
 import { CaloriesIcon, ProteinIcon, CarbsIcon, FatIcon, ProductIcon } from "../components/icons";
-import BotanicalBackground from "../components/BotanicalBackground";
 
 function ProductInfo({
   product,
-  price,
-  onSetPrice,
   onAdd,
   onBack
 }) {
-
-  const [priceInput, setPriceInput] = useState("");
-
-  const priceInputValid = /^\d+(\.\d{1,2})?$/.test(priceInput.trim());
 
   function fmt(value, suffix) {
 
@@ -24,29 +16,12 @@ function ProductInfo({
   }
 
   function handleAdd() {
-
-    if (price === null) {
-
-      if (!priceInputValid) return;
-
-      const finalPrice = Number(priceInput.trim());
-
-      onSetPrice(product.id, finalPrice);
-
-      onAdd(product, finalPrice);
-
-    } else {
-
-      onAdd(product, price);
-
-    }
-
+    onAdd(product);
   }
 
   return (
 
     <div className="product-container">
-      <BotanicalBackground />
 
       <div className="product-card premium-product">
 
@@ -87,46 +62,6 @@ function ProductInfo({
         </div>
 
         <div className="nutrition-grid premium-nutrition">
-
-          <div className="price-card">
-
-            {price === null ? (
-
-              <input
-
-                className="price-input"
-
-                type="number"
-
-                min="0"
-
-                step="0.5"
-
-                aria-label="Price in rupees"
-
-                placeholder="₹"
-
-                value={priceInput}
-
-                onChange={(event) => setPriceInput(event.target.value)}
-
-              />
-
-            ) : (
-
-              <h2>
-                ₹{price}
-              </h2>
-
-            )}
-
-            <span>
-
-              {price === null ? "Enter Price" : "Price"}
-
-            </span>
-
-          </div>
 
           <div>
 
@@ -197,8 +132,6 @@ function ProductInfo({
             className="start-btn premium-btn"
 
             onClick={handleAdd}
-
-            disabled={price === null && !priceInputValid}
 
           >
 

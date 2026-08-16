@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 
 import AppLayout from "../components/layout/AppLayout";
 import { ScanIcon, LeafIcon, HeartIcon, AppleIcon, BroccoliIcon, CarrotIcon, BananaIcon, TomatoIcon } from "../components/icons";
-import BotanicalBackground from "../components/BotanicalBackground";
 
 import "./../styles/global.css";
 
@@ -71,7 +70,6 @@ function Welcome({ onStart }) {
   return (
 
     <AppLayout>
-      <BotanicalBackground />
 
       <div className="welcome-card premium-welcome dither-overlay">
 

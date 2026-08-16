@@ -1,6 +1,5 @@
 import "./../styles/basket.css";
 import { BasketIcon } from "../components/icons";
-import BotanicalBackground from "../components/BotanicalBackground";
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -44,7 +43,6 @@ function Basket({
 
   return (
     <div className="basket-container">
-      <BotanicalBackground />
 
       <div className="basket-card">
 
