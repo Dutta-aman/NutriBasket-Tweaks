@@ -36,5 +36,5 @@ dist-ssr
 *.sw?
 .env*
 
-# OpenCode skills (not project code)
+# (not project code)
 .opencode/
