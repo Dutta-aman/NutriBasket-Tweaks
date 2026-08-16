@@ -1,4 +1,6 @@
 import "./../styles/basket.css";
+import { BasketIcon } from "../components/icons";
+import BotanicalBackground from "../components/BotanicalBackground";
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -42,6 +44,7 @@ function Basket({
 
   return (
     <div className="basket-container">
+      <BotanicalBackground />
 
       <div className="basket-card">
 
@@ -50,6 +53,8 @@ function Basket({
         {basket.length === 0 ? (
 
           <div className="empty-box">
+
+            <div style={{ marginBottom: "16px" }}><BasketIcon size={48} /></div>
 
             <h2>Your basket is empty</h2>
 

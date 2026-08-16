@@ -1,245 +1,245 @@
-.basket-container{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:40px;
-    background:radial-gradient(circle at top,#065F46,#022C22 65%);
+/* ================= Basket — Gem & Earth theme ================= */
+
+.basket-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
 }
 
-.basket-card{
-    width:min(92vw,950px);
-    background:rgba(255,255,255,.12);
-    backdrop-filter:blur(18px);
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:28px;
-    padding:35px;
-    color:white;
-    box-shadow:0 20px 45px rgba(0,0,0,.35);
+.basket-card {
+  width: min(92vw, 480px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  color: var(--text);
+  box-shadow: var(--shadow-card);
 }
 
-.basket-card h1{
-    text-align:center;
-    font-size:38px;
-    margin-bottom:30px;
+.basket-card h1 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 28px;
 }
 
-.empty-box{
-    text-align:center;
-    padding:60px 20px;
+.empty-box {
+  text-align: center;
+  padding: 56px 20px;
 }
 
-.empty-box h2{
-    font-size:30px;
-    margin-bottom:15px;
+.empty-box h2 {
+  font-size: 22px;
+  margin-bottom: 12px;
 }
 
-.empty-box p{
-    opacity:.85;
-    margin-bottom:30px;
+.empty-box p {
+  color: var(--text-muted);
+  margin-bottom: 28px;
 }
 
-.basket-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:rgba(255,255,255,.08);
-    border-radius:20px;
-    padding:20px;
-    margin-bottom:18px;
-    transition:.3s;
+.basket-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.basket-item:hover{
-    transform:translateY(-4px);
-    background:rgba(255,255,255,.14);
+.basket-item:hover {
+  border-color: var(--emerald-300);
+  box-shadow: var(--shadow-card);
 }
 
-.basket-left{
-    display:flex;
-    align-items:center;
-    gap:18px;
+.basket-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.product-avatar{
-    width:70px;
-    height:70px;
-    border-radius:18px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:34px;
-    background:rgba(255,255,255,.15);
+.product-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 28px;
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
 }
 
-.basket-left h2{
-    margin-bottom:6px;
+.basket-left h2 {
+  margin-bottom: 4px;
+  font-size: 15px;
 }
 
-.basket-left p{
-    opacity:.85;
-    margin:4px 0;
+.basket-left p {
+  color: var(--text-muted);
+  margin: 2px 0;
+  font-size: 13px;
 }
 
-.basket-right{
-    text-align:right;
+.basket-right {
+  text-align: right;
 }
 
-.quantity-box{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:12px;
-    margin-bottom:12px;
+.basket-right h3 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  color: var(--secondary);
 }
 
-.qty-btn{
-    width:38px;
-    height:38px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    font-size:22px;
-    font-weight:bold;
-    background:white;
-    color:var(--primary);
-    transition:.25s;
+.quantity-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-.qty-btn:hover{
-    transform:scale(1.08);
+.qty-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  background: var(--surface);
+  color: var(--primary);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.remove-btn{
-    margin-top:12px;
-    padding:10px 18px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    background:#ef4444;
-    color:white;
-    font-weight:600;
-    transition:.25s;
+.qty-btn:hover {
+  background: var(--emerald-50);
+  border-color: var(--emerald-300);
 }
 
-.remove-btn:hover{
-    background:#dc2626;
+.remove-btn {
+  margin-top: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: #FEE2E2;
+  color: var(--danger);
+  font-weight: 600;
+  font-size: 13px;
+  transition: background-color 0.15s ease;
 }
 
-.nutrition-summary{
-    margin-top:35px;
-    padding:25px;
-    border-radius:22px;
-    background:rgba(255,255,255,.08);
+.remove-btn:hover {
+  background: #FECACA;
 }
 
-.nutrition-summary h2{
-    margin-bottom:20px;
+.nutrition-summary {
+  margin-top: 24px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
 }
 
-.nutrition-grid-2{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:18px;
+.nutrition-summary h2 {
+  margin-bottom: 16px;
+  font-size: 18px;
 }
 
-.nutrition-grid-2 div{
-    text-align:center;
-    padding:18px;
-    border-radius:18px;
-    background:rgba(255,255,255,.10);
+.nutrition-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
 }
 
-.nutrition-grid-2 h3{
-    font-size:28px;
-    margin-bottom:8px;
+.nutrition-grid-2 div {
+  text-align: center;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
-.total-box{
-    margin-top:30px;
-    padding:22px;
-    border-radius:22px;
-    background:rgba(255,255,255,.12);
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+.nutrition-grid-2 h3 {
+  font-size: 20px;
+  margin-bottom: 4px;
+  color: var(--primary);
+  font-family: var(--font-mono);
 }
 
-.total-box h1{
-    font-size:42px;
+.nutrition-grid-2 span {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
-.basket-actions{
-    display:flex;
-    justify-content:space-between;
-    margin-top:30px;
-    gap:20px;
+.total-box {
+  margin-top: 20px;
+  padding: 18px 22px;
+  border-radius: var(--radius-md);
+  background: var(--amethyst-50);
+  border: 1px solid var(--amethyst-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.start-btn,
-.secondary-btn{
-    flex:1;
-    padding:16px;
-    border:none;
-    border-radius:16px;
-    cursor:pointer;
-    font-size:17px;
-    font-weight:600;
-    transition:.3s;
+.total-box h2 {
+  font-size: 18px;
 }
 
-.start-btn{
-    background:var(--primary);
-    color:white;
+.total-box h1 {
+  font-size: 28px;
+  color: var(--secondary);
+  font-family: var(--font-mono);
 }
 
-.start-btn:hover{
-    transform:translateY(-2px);
-    background:var(--primary-dark);
+.basket-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 12px;
 }
 
-.secondary-btn{
-    background:white;
-    color:var(--primary);
+.basket-actions .start-btn,
+.basket-actions .secondary-btn {
+  flex: 1;
+  padding: 14px;
+  font-size: 15px;
 }
 
-.secondary-btn:hover{
-    transform:translateY(-2px);
-}
+@media (max-width: 900px) {
+  .basket-card {
+    width: 100%;
+    padding: 24px;
+  }
 
-@media(max-width:900px){
+  .basket-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
 
-    .basket-card{
-        width:100%;
-        padding:25px;
-    }
+  .basket-right {
+    width: 100%;
+    text-align: left;
+  }
 
-    .basket-item{
-        flex-direction:column;
-        align-items:flex-start;
-        gap:20px;
-    }
+  .quantity-box {
+    justify-content: flex-start;
+  }
 
-    .basket-right{
-        width:100%;
-        text-align:left;
-    }
+  .basket-actions {
+    flex-direction: column;
+  }
 
-    .quantity-box{
-        justify-content:flex-start;
-    }
-
-    .nutrition-grid-2{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .basket-actions{
-        flex-direction:column;
-    }
-
-    .total-box{
-        flex-direction:column;
-        gap:12px;
-    }
-
+  .total-box {
+    flex-direction: column;
+    gap: 8px;
+  }
 }

@@ -1,17 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserMultiFormatReader, BrowserCodeReader } from "@zxing/browser";
-import { gtinCheckDigitValid } from "../../lib/barcode";
+import { gtinCheckDigitValid, extractBarcodeFromQr, isPaymentQR } from "../../lib/barcode";
+import { ScanIcon } from "../icons";
 
 const STATUS_TEXT = {
   idle: "Tap Scan Now to begin",
   starting: "Starting camera…",
   scanning: "Ready to Scan",
   detected: "✅ Barcode captured — looking up…",
+  "qr-detected": "✅ Product QR captured — looking up…",
   denied: "Camera access blocked",
   "no-camera": "No camera found",
   busy: "Camera is busy",
   error: "Camera failed to start",
   invalid: "✗ Not a valid product barcode — try again",
+  payment: "✗ Payment not available in app",
 };
 
 function BarcodeScanner({ onDetected }) {
@@ -59,6 +62,21 @@ function BarcodeScanner({ onDetected }) {
         }
         lastScanRef.current = { text, at: now };
         if (!gtinCheckDigitValid(text)) {
+          if (isPaymentQR(text)) {
+            stopScanner();
+            setStatus("payment");
+            return;
+          }
+          const barcode = extractBarcodeFromQr(text);
+          if (barcode) {
+            setStatus("qr-detected");
+            stopScanner();
+            detectedTimeoutRef.current = setTimeout(() => {
+              if (!mountedRef.current) return;
+              onDetected(barcode);
+            }, 600);
+            return;
+          }
           stopScanner();
           setStatus("invalid");
           return;
@@ -98,12 +116,14 @@ function BarcodeScanner({ onDetected }) {
 
   const failed = ["denied", "no-camera", "busy", "error"].includes(status);
 
-  const bad = failed || status === "invalid";
+  const bad = failed || status === "invalid" || status === "payment";
+
+  const success = status === "detected" || status === "qr-detected";
 
   return (
     <>
       <div className="scanner-ui">
-        <div className={`scanner-frame premium-scanner${status === "invalid" ? " scanner-invalid" : ""}`}>
+        <div className={`scanner-frame premium-scanner${status === "invalid" || status === "payment" ? " scanner-invalid" : ""}`}>
           <video ref={videoRef} className="scanner-video" muted playsInline />
           <div className="scan-corner top-left"></div>
           <div className="scan-corner top-right"></div>
@@ -113,32 +133,32 @@ function BarcodeScanner({ onDetected }) {
           {status === "idle" && (
             <div className="scanner-overlay">📸</div>
           )}
-          {status === "detected" && (
+          {success && (
             <div className="scanner-success">✓</div>
           )}
         </div>
       </div>
 
       <div className="scanner-status premium-status" role="status" aria-live="polite">
-        <span>{bad ? "🔴" : status === "starting" ? "⏳" : status === "detected" ? "✅" : "🟢"}</span>
+        <span>{bad ? "🔴" : status === "starting" ? "⏳" : success ? "✅" : "🟢"}</span>
         {STATUS_TEXT[status]}
       </div>
 
       <p className="scan-help">
         {bad
           ? "You can still enter the barcode manually below."
-          : "Place the barcode inside the frame"}
+          : "Place a barcode or product QR inside the frame"}
       </p>
 
       {status === "idle" && (
         <button className="start-btn premium-btn" onClick={startScanner}>
-          📸 Scan Now
+          <ScanIcon size={18} /> Scan Now
         </button>
       )}
 
       {bad && (
-        <button className="start-btn premium-btn" onClick={status === "invalid" ? resetToIdle : startScanner}>
-          🔄 Try Again
+        <button className="start-btn premium-btn" onClick={status === "invalid" || status === "payment" ? resetToIdle : startScanner}>
+          Try Again
         </button>
       )}
     </>
