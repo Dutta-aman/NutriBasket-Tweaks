@@ -1,11 +1,11 @@
-name: Deploy to Render
+name: Deploy to Render & Vercel
 
 on:
   push:
     branches: [main, tweaks]
 
 jobs:
-  deploy:
+  render:
     runs-on: ubuntu-latest
     steps:
       - name: Guard — RENDER_SERVICE_ID must be set
@@ -21,3 +21,21 @@ jobs:
             -H "Content-Type: application/json" \
             -d '{"clearCache":"do_not_clear","commitId":"${{ github.sha }}"}' \
             https://api.render.com/v1/services/${{ vars.RENDER_SERVICE_ID }}/deploys
+
+  vercel:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Guard — VERCEL_TOKEN must be set
+        if: secrets.VERCEL_TOKEN == ''
+        run: |
+          echo "::error::Set the VERCEL_TOKEN secret (Settings → Secrets and variables → Actions → Secrets) to a Vercel access token."
+          exit 1
+
+      - name: Trigger Vercel deploy (production)
+        run: |
+          curl -sS --fail-with-body -X POST \
+            -H "Authorization: Bearer ${{ secrets.VERCEL_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"name":"nutribasket-tweaks","project":"nutribasket-tweaks","target":"production","gitSource":{"type":"github","repoId":1334091404,"ref":"${{ github.ref_name }}"}}' \
+            "https://api.vercel.com/v13/deployments?teamId=team-1-be60"
