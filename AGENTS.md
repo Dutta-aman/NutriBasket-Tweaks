@@ -14,8 +14,7 @@
 
 - **Main working repo:** `Dutta-aman/NutriBasket-Tweaks` (private, Dutta-aman account) — cloned at `/home/india/Store D/opencode/NutriBasket_Tweaks` (branch `main`, SSH via `git@github-dutta` = Dutta-aman's key)
 - **Old repo (parked, used later):** `Dutta-aman/NutriBasket` (fork of madhushreemail-stack/NutriBasket) — local dir: `/home/india/Store D/opencode/NutriBasket 4th yr project`
-- **Two git accounts on this machine:**
-
+- **Git identity on this machine:**
   - `Dutta-aman` (SSH alias `github-dutta`, key `~/.ssh/id_ed25519_dutta`, email amanduttakolkata@gmail.com → noreply `Dutta-aman@users.noreply.github.com`)
 - **gh CLI** is authed as Dutta-aman (for NutriBasket-Tweaks work). GH007 email privacy: push with noreply email.
 
