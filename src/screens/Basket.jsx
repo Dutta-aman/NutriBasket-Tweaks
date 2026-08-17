@@ -1,5 +1,6 @@
 import "./../styles/basket.css";
 import { BasketIcon } from "../components/icons";
+import BasketBudgetBar from "../components/BasketBudgetBar";
 
 function round2(n) { return Math.round(n * 100) / 100; }
 
@@ -9,6 +10,7 @@ function Basket({
   updateQuantity,
   onCheckout,
   onContinue,
+  profile,
 }) {
 
   function removeItem(index) {
@@ -176,6 +178,8 @@ function Basket({
               <h1>₹{round2(totalAmount)}</h1>
 
             </div>
+
+            <BasketBudgetBar basket={basket} profile={profile} />
 
             <div className="basket-actions">
 

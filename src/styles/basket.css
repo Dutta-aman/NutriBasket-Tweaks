@@ -213,6 +213,121 @@
   font-size: 15px;
 }
 
+.budget-note {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.budget-card {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, var(--amethyst-50), var(--surface-muted));
+  border: 1px solid var(--amethyst-200);
+}
+
+.budget-title {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.budget-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  color: var(--danger);
+}
+
+.budget-warning svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.budget-warning strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.budget-warning span {
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.budget-row {
+  margin-bottom: 12px;
+}
+
+.budget-row:last-child {
+  margin-bottom: 0;
+}
+
+.budget-row-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.budget-label {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.budget-value {
+  font-family: var(--font-mono);
+  color: var(--text);
+  font-size: 12px;
+  text-align: right;
+}
+
+.budget-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.budget-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--emerald-600);
+  transition: width 0.3s ease;
+}
+
+.budget-bar-fill.warn {
+  background: var(--warning);
+}
+
+.budget-bar-fill.danger {
+  background: var(--danger);
+}
+
+.budget-tip {
+  margin-top: 16px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
+  color: var(--emerald-700);
+  font-size: 13px;
+}
+
 @media (max-width: 900px) {
   .basket-card {
     width: 100%;
