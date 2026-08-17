@@ -7,6 +7,8 @@ import ProductInfo from "./screens/ProductInfo";
 import Basket from "./screens/Basket";
 import { fetchProductByBarcode } from "./lib/api";
 import { extractBarcodeFromQr } from "./lib/barcode";
+import ProfileBoundary from "./components/ProfileBoundary";
+import { loadProfile, storageSet, storageRemove, PROFILE_KEY } from "./lib/storage";
 
 function App() {
 
@@ -23,6 +25,8 @@ function App() {
   const [prices] = useState({});
 
   const [slowLookup, setSlowLookup] = useState(false);
+
+  const [profile, setProfile] = useState(() => loadProfile());
 
   const lookupSeqRef = useRef(0);
 
@@ -160,11 +164,42 @@ function App() {
 
   }
 
+  function handleProfileComplete(p) {
+
+    setProfile(p);
+
+    storageSet(PROFILE_KEY, p);
+
+    setPage("home");
+
+  }
+
+  function handleProfileReset() {
+
+    storageRemove(PROFILE_KEY);
+
+    setProfile(null);
+
+    setPage("welcome");
+
+  }
+
   if (page === "welcome") {
 
     return (
       <Welcome
-        onStart={() => setPage("home")}
+        onStart={() => setPage(profile ? "home" : "profile")}
+      />
+    );
+
+  }
+
+  if (page === "profile") {
+
+    return (
+      <ProfileBoundary
+        onReset={handleProfileReset}
+        onComplete={handleProfileComplete}
       />
     );
 
@@ -286,6 +321,7 @@ function App() {
       return (
         <ProductInfo
           product={selectedProduct}
+          profile={profile}
           onBack={() => setPage("scan")}
           onAdd={addProduct}
         />

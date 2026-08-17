@@ -249,7 +249,8 @@ button {
 .product-container,
 .basket-container,
 .checkout-container,
-.success-container {
+.success-container,
+.profile-container {
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -279,7 +280,8 @@ button {
 .basket-card,
 .checkout-card,
 .success-card,
-.welcome-card {
+.welcome-card,
+.profile-card {
   width: 100%;
   max-width: min(92vw, 560px);
   background: var(--surface);
@@ -911,6 +913,103 @@ button {
   min-width: 140px;
 }
 
+/* ================= Personal Fit ================= */
+
+.personal-fit-card {
+  background: linear-gradient(160deg, var(--emerald-50), var(--surface-muted));
+  border: 1px solid var(--emerald-200);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.personal-fit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.personal-fit-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--emerald-700);
+}
+
+.personal-fit-chip {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--emerald-100);
+  color: var(--emerald-700);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--emerald-200);
+}
+
+.personal-fit-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.personal-fit-line svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--emerald-600);
+}
+
+.personal-fit-line.personal-fit-warning svg {
+  color: var(--warning);
+}
+
+.personal-fit-calorie {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.personal-fit-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--emerald-100);
+  overflow: hidden;
+}
+
+.personal-fit-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--emerald-400), var(--emerald-600));
+  transition: width 0.4s ease;
+}
+
+.personal-fit-caption {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.personal-fit-note {
+  background: var(--surface-muted);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
 /* ================= Inputs ================= */
 
 .manual-form {
@@ -1079,6 +1178,10 @@ button {
     max-width: 640px;
   }
 
+  .profile-card {
+    max-width: 640px;
+  }
+
   .dashboard-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
@@ -1113,6 +1216,10 @@ button {
   }
 
   .welcome-card {
+    max-width: 720px;
+  }
+
+  .profile-card {
     max-width: 720px;
   }
 

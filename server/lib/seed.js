@@ -31,6 +31,11 @@ export function findInSeed(barcode) {
     protein: row.proteins ?? null,
     carbs: row.carbs ?? null,
     fat: row.fat ?? null,
+    satfat: row.satfat ?? null,
+    sugars: row.sugars ?? null,
+    fiber: row.fiber ?? null,
+    salt: row.salt ?? null,
+    serving_size: row.serving_size ?? null,
     source: "seed",
     image_url: row.image_url ?? null,
   };

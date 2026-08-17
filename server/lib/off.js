@@ -81,6 +81,11 @@ function normalizeProduct(code, data) {
     protein: pickFirst(n.proteins_100g, n.proteins_serving, n.proteins),
     carbs: pickFirst(n.carbohydrates_100g, n.carbohydrates_serving, n.carbohydrates),
     fat: pickFirst(n.fat_100g, n.fat_serving, n.fat),
+    satfat: pickFirst(n["saturated-fat_100g"], n["saturated-fat_serving"], n["saturated-fat"]),
+    sugars: pickFirst(n.sugars_100g, n.sugars_serving, n.sugars),
+    fiber: pickFirst(n.fiber_100g, n.fiber_serving, n.fiber),
+    salt: pickFirst(n.salt_100g, n.salt_serving, n.salt),
+    serving_size: p.serving_size || null,
   };
 }
 
@@ -88,7 +93,7 @@ export async function getProductByBarcode(barcode) {
   const cached = get(barcode);
   if (cached === NOT_FOUND) return null;
   if (cached) return cached;
-  const url = `${BASE_URL}/api/v2/product/${barcode}.json?fields=code,product_name,brands,image_front_url,image_url,quantity,nutriments`;
+  const url = `${BASE_URL}/api/v2/product/${barcode}.json?fields=code,product_name,brands,image_front_url,image_url,quantity,serving_size,nutriments`;
   const data = await fetchWithRetry(url);
   const product = normalizeProduct(barcode, data);
   if (product) set(barcode, product);
