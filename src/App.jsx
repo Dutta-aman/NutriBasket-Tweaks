@@ -340,6 +340,7 @@ function App() {
         basket={basket}
         setBasket={setBasket}
         updateQuantity={updateQuantity}
+        profile={profile}
         onContinue={() => setPage("home")}
       />
     );
