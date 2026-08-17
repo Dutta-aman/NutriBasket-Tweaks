@@ -1,8 +1,10 @@
 import "./../styles/global.css";
 import { CaloriesIcon, ProteinIcon, CarbsIcon, FatIcon, ProductIcon } from "../components/icons";
+import PersonalFitCard from "../components/PersonalFitCard";
 
 function ProductInfo({
   product,
+  profile,
   onAdd,
   onBack
 }) {
@@ -112,6 +114,8 @@ function ProductInfo({
           </div>
 
         </div>
+
+        <PersonalFitCard product={product} profile={profile} />
 
         <div className="product-buttons premium-product-buttons">
 
