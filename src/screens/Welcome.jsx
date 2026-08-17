@@ -10,41 +10,27 @@ function Welcome({ onStart }) {
 
 
   const [time, setTime] = useState("");
+  const [introKey, setIntroKey] = useState(0);
 
 
   useEffect(() => {
-
-    const updateTime = () => {
-
-      const now = new Date();
-
-      setTime(
-
-        now.toLocaleTimeString([], {
-
-          hour: "2-digit",
-
-          minute: "2-digit"
-
-        })
-
-      );
-
+    const onShow = (e) => {
+      if (e.persisted) setIntroKey((k) => k + 1);
     };
+    window.addEventListener("pageshow", onShow);
+    return () => window.removeEventListener("pageshow", onShow);
+  }, []);
 
 
-    updateTime();
 
-
-    const interval = setInterval(
-      updateTime,
-      1000
-    );
-
-
-    return () => clearInterval(interval);
-
-
+  useEffect(() => {
+    const tick = () =>
+      setTime(
+        new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+      );
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
   }, []);
 
 
@@ -71,11 +57,21 @@ function Welcome({ onStart }) {
 
     <AppLayout>
 
-      <div className="welcome-card premium-welcome pixel-reveal" style={{ "--d": "0.1s" }}>
+      <div key={introKey} className="welcome-card premium-welcome pixel-reveal" style={{ "--d": "0.1s" }}>
 
+        <div className="pixel-reveal-inner">
 
-        <div className="brand-logo pixel-reveal" style={{ "--d": "0.15s" }}>
-          <LeafIcon size={48} className="brand-icon" />
+        <div className="welcome-clock pixel-reveal" style={{ "--d": "0.2s" }}>
+          <span className="pixel-reveal-inner">
+            <time className="clock-date">{today}</time>
+            <time className="clock-time">{time}</time>
+          </span>
+        </div>
+
+        <div className="brand-logo pixel-reveal" style={{ "--d": "0.2s" }}>
+          <span className="pixel-reveal-inner">
+            <LeafIcon size={48} className="brand-icon" />
+          </span>
         </div>
 
 
@@ -83,13 +79,17 @@ function Welcome({ onStart }) {
         <h1>
 
           {"Nutri".split("").map((c, i) => (
-            <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.15s" }}>{c}</i>
+            <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.3s" }}>
+              <span className="pixel-reveal-inner">{c}</span>
+            </i>
           ))}
 
           <span>
 
             {"Basket".split("").map((c, i) => (
-              <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.15s" }}>{c}</i>
+              <i key={c + i} className="brand-letter pixel-reveal" style={{ "--d": "0.3s" }}>
+                <span className="pixel-reveal-inner">{c}</span>
+              </i>
             ))}
 
           </span>
@@ -98,70 +98,48 @@ function Welcome({ onStart }) {
 
 
 
-        <h2 className="pixel-reveal" style={{ "--d": "0.15s" }}>
+        <h2 className="pixel-reveal" style={{ "--d": "0.4s" }}>
 
-          Smart Shopping Assistant
+          <span className="pixel-reveal-inner">Smart Shopping Assistant</span>
 
         </h2>
 
 
 
-        <p className="welcome-text pixel-reveal" style={{ "--d": "0.15s" }}>
+        <p className="welcome-text pixel-reveal" style={{ "--d": "0.4s" }}>
 
-          Experience smarter grocery shopping with
-          real-time product scanning, nutrition tracking,
-          and a curated basket of fresh produce.
+          <span className="pixel-reveal-inner">
+            Experience smarter grocery shopping with
+            real-time product scanning, nutrition tracking,
+            and a curated basket of fresh produce.
+          </span>
 
         </p>
-        <div className="botanical-row pixel-reveal" style={{ "--d": "0.15s" }}>
-          <AppleIcon size={24} />
-          <BroccoliIcon size={24} />
-          <CarrotIcon size={24} />
-          <BananaIcon size={24} />
-          <TomatoIcon size={24} />
+        <div className="botanical-row pixel-reveal" style={{ "--d": "0.4s" }}>
+          <span className="pixel-reveal-inner">
+            <AppleIcon size={24} />
+            <BroccoliIcon size={24} />
+            <CarrotIcon size={24} />
+            <BananaIcon size={24} />
+            <TomatoIcon size={24} />
+          </span>
         </div>
 
         <div className="section-divider">
           <LeafIcon size={14} />
         </div>
 
-        <div className="store-info premium-info pixel-reveal" style={{ "--d": "0.15s" }}>
-
-          <div>
-
-            <span className="store-icon">📅</span>
-
-            <p>
-              {today}
-            </p>
-
-          </div>
-
-
-
-          <div>
-
-            <span className="store-icon">🕒</span>
-
-            <p>
-              {time}
-            </p>
-
-          </div>
-
-        </div>
-
         <button
 
           className="start-btn premium-btn pixel-reveal"
 
-          style={{ "--d": "0.15s" }}
+          style={{ "--d": "0.5s" }}
 
           onClick={onStart}
 
         >
 
-          Get Started
+          <span className="pixel-reveal-inner">Get Started</span>
 
         </button>
         <div className="section-divider">
@@ -169,8 +147,9 @@ function Welcome({ onStart }) {
         </div>
 
 
-        <div className="feature-row premium-features pixel-reveal" style={{ "--d": "0.15s" }}>
+        <div className="feature-row premium-features pixel-reveal" style={{ "--d": "0.55s" }}>
 
+          <div className="pixel-reveal-inner">
 
           <div className="feature-card">
 
@@ -206,6 +185,9 @@ function Welcome({ onStart }) {
 
           </div>
 
+          </div>
+
+        </div>
 
         </div>
 
