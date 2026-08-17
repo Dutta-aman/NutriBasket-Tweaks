@@ -50,3 +50,30 @@ export function explainFit(profile, product) {
 
   return NO_DATA_MESSAGE;
 }
+
+export function productRiskFlags(product) {
+  const data = product ?? {};
+  const flags = [];
+
+  const fiber = data.fiber;
+  if (fiber != null && !Number.isNaN(fiber) && fiber < 3) {
+    flags.push({ label: "Low fiber", tip: "Pair it with dal or fruit" });
+  }
+
+  const sugars = data.sugars;
+  if (sugars != null && !Number.isNaN(sugars) && sugars > 15) {
+    flags.push({ label: "High sugar", tip: "Keep it to occasional" });
+  }
+
+  const salt = data.salt;
+  if (salt != null && !Number.isNaN(salt) && salt > 1.5) {
+    flags.push({ label: "High salt", tip: "Watch your portion size" });
+  }
+
+  const satfat = data.satfat;
+  if (satfat != null && !Number.isNaN(satfat) && satfat > 5) {
+    flags.push({ label: "High saturated fat", tip: "Prefer lean or air-fried" });
+  }
+
+  return flags;
+}
