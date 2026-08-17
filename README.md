@@ -242,5 +242,4 @@ Nutrition data comes from **Open Food Facts**, © Open Food Facts contributors, 
 
 ## Credits
 
-- **Base project:** built on the original [NutriBasket](https://github.com/madhushreemail-stack/NutriBasket) by [madhushreemail-stack](https://github.com/madhushreemail-stack)
 - **Nutrition data:** [Open Food Facts India](https://in.openfoodfacts.org), ODbL licensed (see LICENSE-ODbL)
