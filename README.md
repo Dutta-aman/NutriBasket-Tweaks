@@ -239,3 +239,8 @@ Nutrition data comes from **Open Food Facts**, © Open Food Facts contributors, 
 - **Demo payments** — checkout shows a simulated UPI screen and a generated transaction ID; no real money moves.
 - **Barcode deep-links** — plain EAN-13 barcodes cannot open the app from a stock camera; only QR codes deep-link (see Scanning Flows).
 - **Roadmap ideas** — full India seed, automated tests, basket/scan-history persistence, real payment integration, AI-based nutrition guidance.
+
+## Credits
+
+- **Base project:** built on the original [NutriBasket](https://github.com/madhushreemail-stack/NutriBasket) by [madhushreemail-stack](https://github.com/madhushreemail-stack)
+- **Nutrition data:** [Open Food Facts India](https://in.openfoodfacts.org), ODbL licensed (see LICENSE-ODbL)
