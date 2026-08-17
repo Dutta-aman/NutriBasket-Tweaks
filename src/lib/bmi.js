@@ -101,3 +101,43 @@ export function fmt(n) {
   if (n == null || Number.isNaN(n)) return "—";
   return n % 1 === 0 ? String(n) : n.toFixed(1);
 }
+
+const RISK_BANDS = [
+  { max: 18.5, risks: ["Malnutrition", "Osteoporosis"] },
+  { max: 23, risks: [] },
+  { max: 25, risks: ["Pre-diabetes", "Dyslipidemia"] },
+  { max: 30, risks: ["Type 2 diabetes", "Hypertension", "NAFLD"] },
+  { max: Infinity, risks: ["Cardiovascular disease", "Stroke", "Sleep apnea"] },
+];
+
+const UNDER_PERCEPTIONS = ["About right / healthy", "Slim / underweight"];
+const OVER_PERCEPTIONS = ["Overweight", "Very overweight"];
+
+export function riskProfile(bmi) {
+  if (bmi == null || Number.isNaN(bmi)) return [];
+  const band = RISK_BANDS.find((b) => bmi < b.max) ?? RISK_BANDS[RISK_BANDS.length - 1];
+  return band.risks;
+}
+
+export function perceptionCase(profile, bmi) {
+  if (!profile || bmi == null || Number.isNaN(bmi)) return null;
+  const perceptions = Array.isArray(profile.perception) ? profile.perception : [];
+  if (perceptions.length === 0) return null;
+  if (bmi >= 23 && perceptions.some((p) => UNDER_PERCEPTIONS.includes(p))) return "under";
+  if (bmi < 23 && perceptions.some((p) => OVER_PERCEPTIONS.includes(p))) return "over";
+  return "accurate";
+}
+
+export function perceptionMessage(profile, bmi) {
+  const caseName = perceptionCase(profile, bmi);
+  if (caseName === "under") {
+    return "Your measured BMI suggests more than your current feeling — small, staged changes will help.";
+  }
+  if (caseName === "over") {
+    return "You're within a healthy band — focus on maintaining, not losing.";
+  }
+  if (caseName === "accurate") {
+    return "Your body sense matches your measured BMI — steady progress works.";
+  }
+  return null;
+}

@@ -2,6 +2,7 @@ import { CheckIcon, WarningIcon } from "./icons";
 
 import { computeBMI, bmiCategory, computeTargets, fmt } from "../lib/bmi";
 import { explainFit } from "../lib/explainer";
+import RiskChips from "./RiskChips";
 
 function PersonalFitCard({ product, profile }) {
 
@@ -78,6 +79,8 @@ function PersonalFitCard({ product, profile }) {
 
         </div>
       ) : null}
+
+      <RiskChips profile={profile} product={product} />
 
     </div>
   );
