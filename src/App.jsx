@@ -188,6 +188,7 @@ function App() {
 
     return (
       <Welcome
+        profile={profile}
         onStart={() => setPage(profile ? "home" : "profile")}
       />
     );

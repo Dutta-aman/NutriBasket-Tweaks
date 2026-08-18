@@ -85,6 +85,19 @@ function parseNumber(value) {
   return Number.isFinite(n) ? n : null;
 }
 
+const IN_PER_CM = 1 / 2.54;
+const FT_PER_CM = 1 / (12 * 2.54);
+
+function cmToFtIn(cm) {
+  const ft = Math.floor(cm * FT_PER_CM);
+  const inch = Math.round(cm * IN_PER_CM) % 12;
+  return { ft, inch };
+}
+
+function ftInToCm(ft, inch) {
+  return Math.round((ft * 12 + inch) / IN_PER_CM);
+}
+
 function Bubble({ label, sub, selected, onSelect, onRemove }) {
   return (
     <span className={"profile-bubble" + (selected ? " profile-bubble--selected" : "")}>
@@ -120,7 +133,9 @@ function Profile({ onComplete }) {
   const [age, setAge] = useState("");
   const [weight, setWeight] = useState("");
   const [height, setHeight] = useState("");
-  const [heightUnknown, setHeightUnknown] = useState(false);
+  const [heightUnit, setHeightUnit] = useState("cm");
+  const [heightFt, setHeightFt] = useState("");
+  const [heightIn, setHeightIn] = useState("");
   const [gender, setGender] = useState(null);
   const [perception, setPerception] = useState([]);
   const [goal, setGoal] = useState([]);
@@ -130,16 +145,33 @@ function Profile({ onComplete }) {
 
   const ageNum = parseNumber(age);
   const weightNum = parseNumber(weight);
-  const heightNum = heightUnknown ? null : parseNumber(height);
+  const heightFtNum = parseNumber(heightFt);
+  const heightInNum = parseNumber(heightIn);
+  const heightNum =
+    heightUnit === "cm"
+      ? parseNumber(height)
+      : heightFtNum !== null && heightInNum !== null
+        ? ftInToCm(heightFtNum, heightInNum)
+        : null;
 
   const ageMissing = age.trim() === "";
   const weightMissing = weight.trim() === "";
-  const heightMissing = !heightUnknown && height.trim() === "";
+  const heightMissing =
+    heightUnit === "cm"
+      ? height.trim() === ""
+      : heightFt.trim() === "" || heightIn.trim() === "";
 
   const ageValid = ageNum !== null && ageNum >= 10 && ageNum <= 100;
   const weightValid = weightNum !== null && weightNum >= 30 && weightNum <= 250;
   const heightValid =
-    heightUnknown || (heightNum !== null && heightNum >= 100 && heightNum <= 250);
+    heightUnit === "cm"
+      ? heightNum !== null && heightNum >= 100 && heightNum <= 250
+      : heightFtNum !== null &&
+        heightInNum !== null &&
+        heightFtNum >= 3 &&
+        heightFtNum <= 8 &&
+        heightInNum >= 0 &&
+        heightInNum <= 11;
 
   let stepValid = true;
   if (step === 1) {
@@ -161,10 +193,35 @@ function Profile({ onComplete }) {
 
   let heightError = null;
   if (heightMissing) heightError = "Please enter your height";
-  else if (!heightValid) heightError = "Height must be between 100 and 250 cm";
+  else if (!heightValid)
+    heightError =
+      heightUnit === "cm"
+        ? "Height must be between 100 and 250 cm"
+        : "Height must be between 3 ft 0 in and 8 ft 11 in";
 
   function markTouched(field) {
     setTouched((prev) => ({ ...prev, [field]: true }));
+  }
+
+  function switchHeightUnit(unit) {
+    if (unit === heightUnit) return;
+    if (unit === "ftin") {
+      const cm = parseNumber(height);
+      if (cm !== null) {
+        const { ft, inch } = cmToFtIn(cm);
+        setHeightFt(String(ft));
+        setHeightIn(String(inch));
+      }
+    } else if (heightFtNum !== null && heightInNum !== null) {
+      setHeight(String(ftInToCm(heightFtNum, heightInNum)));
+    }
+    setHeightUnit(unit);
+  }
+
+  function syncHeightToCm() {
+    if (heightFtNum !== null && heightInNum !== null) {
+      setHeight(String(ftInToCm(heightFtNum, heightInNum)));
+    }
   }
 
   function selectGender(value) {
@@ -203,10 +260,9 @@ function Profile({ onComplete }) {
       return;
     }
     if (!onComplete) return;
-    let heightCm = null;
-    if (!heightUnknown && heightValid) heightCm = heightNum;
+    const heightCm = heightValid ? heightNum : null;
     onComplete({
-      version: 1,
+      version: 2,
       name: name.trim(),
       age: ageValid ? ageNum : null,
       weightKg: weightValid ? weightNum : null,
@@ -221,9 +277,8 @@ function Profile({ onComplete }) {
 
   return (
     <AppLayout>
-      <div className="profile-card pixel-reveal" style={{ "--d": "0.1s" }}>
-        <div className="pixel-reveal-inner">
-          <div className="profile-header">
+      <div className="profile-card">
+        <div className="profile-header">
             <div className="profile-header-badge">
               <LeafIcon size={26} />
             </div>
@@ -253,98 +308,155 @@ function Profile({ onComplete }) {
                 <label className="profile-label" htmlFor="profile-name">
                   Name
                 </label>
-                <input
-                  id="profile-name"
-                  type="text"
-                  className="manual-input"
-                  autoComplete="name"
-                  placeholder="Your name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onBlur={() => markTouched("name")}
-                />
+                <div className="profile-input-wrap">
+                  <input
+                    id="profile-name"
+                    type="text"
+                    className="manual-input"
+                    autoComplete="name"
+                    placeholder="Your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    onBlur={() => markTouched("name")}
+                  />
+                </div>
                 {touched.name && nameError ? <p className="manual-error">{nameError}</p> : null}
               </div>
 
-              <div className="profile-grid">
-                <div className="profile-field">
-                  <label className="profile-label" htmlFor="profile-age">
-                    Age
-                  </label>
-                  <div className="profile-input-row">
-                    <input
-                      id="profile-age"
-                      type="text"
-                      className="manual-input"
-                      inputMode="numeric"
-                      placeholder="e.g. 25"
-                      value={age}
-                      onChange={(e) => setAge(cleanNumberInput(e.target.value, false))}
-                      onBlur={() => markTouched("age")}
-                    />
-                    <span className="profile-unit">years</span>
-                  </div>
-                  {touched.age && ageError ? <p className="manual-error">{ageError}</p> : null}
+            <div className="profile-grid">
+              <div className="profile-field">
+                <label className="profile-label" htmlFor="profile-age">
+                  Age
+                </label>
+                <div className="profile-input-wrap">
+                  <input
+                    id="profile-age"
+                    type="text"
+                    className="manual-input"
+                    inputMode="numeric"
+                    placeholder="e.g. 25"
+                    aria-label="Age in years"
+                    value={age}
+                    onChange={(e) => setAge(cleanNumberInput(e.target.value, false))}
+                    onBlur={() => markTouched("age")}
+                  />
+                  <span className="profile-unit-suffix" aria-hidden="true">
+                    years
+                  </span>
                 </div>
-
-                <div className="profile-field">
-                  <label className="profile-label" htmlFor="profile-weight">
-                    Weight
-                  </label>
-                  <div className="profile-input-row">
-                    <input
-                      id="profile-weight"
-                      type="text"
-                      className="manual-input"
-                      inputMode="decimal"
-                      placeholder="e.g. 70.5"
-                      value={weight}
-                      onChange={(e) => setWeight(cleanNumberInput(e.target.value, true))}
-                      onBlur={() => markTouched("weight")}
-                    />
-                    <span className="profile-unit">kg</span>
-                  </div>
-                  {touched.weight && weightError ? (
-                    <p className="manual-error">{weightError}</p>
-                  ) : null}
-                </div>
+                {touched.age && ageError ? <p className="manual-error">{ageError}</p> : null}
               </div>
 
               <div className="profile-field">
-                <label className="profile-label" htmlFor="profile-height">
-                  Height
-                  <small>— you can skip this if you don't know it</small>
+                <label className="profile-label" htmlFor="profile-weight">
+                  Weight
                 </label>
-                <div className="profile-input-row">
+                <div className="profile-input-wrap">
                   <input
-                    id="profile-height"
+                    id="profile-weight"
                     type="text"
                     className="manual-input"
                     inputMode="decimal"
-                    placeholder="e.g. 165"
-                    value={height}
-                    disabled={heightUnknown}
-                    onChange={(e) => setHeight(cleanNumberInput(e.target.value, true))}
-                    onBlur={() => markTouched("height")}
+                    placeholder="e.g. 70.5"
+                    aria-label="Weight in kilograms"
+                    value={weight}
+                    onChange={(e) => setWeight(cleanNumberInput(e.target.value, true))}
+                    onBlur={() => markTouched("weight")}
                   />
-                  <span className="profile-unit">cm</span>
+                  <span className="profile-unit-suffix" aria-hidden="true">
+                    kg
+                  </span>
                 </div>
-                <label className="profile-check">
-                  <input
-                    type="checkbox"
-                    checked={heightUnknown}
-                    onChange={(e) => setHeightUnknown(e.target.checked)}
-                  />
-                  <span>I don't know my height</span>
-                </label>
-                {heightUnknown ? (
-                  <p className="profile-note" role="note">
-                    No problem — without your height we can't calculate a BMI, so you'll get
-                    generic guidance instead: general nutrition targets and tips, without
-                    personal-fit scores on products.
-                  </p>
+                {touched.weight && weightError ? (
+                  <p className="manual-error">{weightError}</p>
                 ) : null}
-                {!heightUnknown && touched.height && heightError ? (
+              </div>
+            </div>
+
+              <div className="profile-field">
+                <label className="profile-label" id="profile-height-label">
+                  Height
+                </label>
+                <div className="profile-segmented" role="group" aria-labelledby="profile-height-label">
+                  <button
+                    type="button"
+                    className={"profile-segmented-option" + (heightUnit === "cm" ? " is-active" : "")}
+                    aria-pressed={heightUnit === "cm"}
+                    onClick={() => switchHeightUnit("cm")}
+                  >
+                    cm
+                  </button>
+                  <button
+                    type="button"
+                    className={
+                      "profile-segmented-option" + (heightUnit === "ftin" ? " is-active" : "")
+                    }
+                    aria-pressed={heightUnit === "ftin"}
+                    onClick={() => switchHeightUnit("ftin")}
+                  >
+                    ft/in
+                  </button>
+                </div>
+                {heightUnit === "cm" ? (
+                  <div className="profile-input-wrap">
+                    <input
+                      id="profile-height"
+                      type="text"
+                      className="manual-input"
+                      inputMode="decimal"
+                      placeholder="e.g. 165"
+                      aria-label="Height in centimetres"
+                      value={height}
+                      onChange={(e) => setHeight(cleanNumberInput(e.target.value, true))}
+                      onBlur={() => markTouched("height")}
+                    />
+                    <span className="profile-unit-suffix" aria-hidden="true">
+                      cm
+                    </span>
+                  </div>
+                ) : (
+                  <div className="profile-ftin-row">
+                    <div className="profile-input-wrap">
+                      <input
+                        id="profile-height-ft"
+                        type="text"
+                        className="manual-input"
+                        inputMode="numeric"
+                        placeholder="5"
+                        aria-label="Height in feet"
+                        value={heightFt}
+                        onChange={(e) => setHeightFt(cleanNumberInput(e.target.value, false))}
+                        onBlur={() => {
+                          markTouched("height");
+                          syncHeightToCm();
+                        }}
+                      />
+                      <span className="profile-unit-suffix" aria-hidden="true">
+                        ft
+                      </span>
+                    </div>
+                    <div className="profile-input-wrap">
+                      <input
+                        id="profile-height-in"
+                        type="text"
+                        className="manual-input"
+                        inputMode="numeric"
+                        placeholder="5"
+                        aria-label="Height in inches"
+                        value={heightIn}
+                        onChange={(e) => setHeightIn(cleanNumberInput(e.target.value, false))}
+                        onBlur={() => {
+                          markTouched("height");
+                          syncHeightToCm();
+                        }}
+                      />
+                      <span className="profile-unit-suffix" aria-hidden="true">
+                        in
+                      </span>
+                    </div>
+                  </div>
+                )}
+                {touched.height && heightError ? (
                   <p className="manual-error">{heightError}</p>
                 ) : null}
               </div>
@@ -476,7 +588,6 @@ function Profile({ onComplete }) {
               Continue
             </button>
           </div>
-        </div>
       </div>
     </AppLayout>
   );
