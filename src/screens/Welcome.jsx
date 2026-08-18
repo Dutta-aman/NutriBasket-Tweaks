@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 
 import AppLayout from "../components/layout/AppLayout";
-import { ScanIcon, LeafIcon, HeartIcon, AppleIcon, BroccoliIcon, CarrotIcon, BananaIcon, TomatoIcon, CherryIcon, MushroomIcon, CitrusIcon, FlowerIcon, LeafSmallIcon, ProductIcon } from "../components/icons";
-import { Apple, Broccoli, Carrot, Banana, Citrus } from "lucide-react";
+import { ScanIcon, LeafIcon, HeartIcon, TomatoIcon, MushroomIcon } from "../components/icons";
+import { Apple, Broccoli, Carrot, Banana, Citrus, Cherry, Leaf, Flower2, Sprout, Barcode } from "lucide-react";
 
 import "./../styles/global.css";
 
 const AVATARS = [
-  ["apple", AppleIcon],
-  ["broccoli", BroccoliIcon],
-  ["carrot", CarrotIcon],
-  ["banana", BananaIcon],
+  ["apple", Apple],
+  ["broccoli", Broccoli],
+  ["carrot", Carrot],
+  ["banana", Banana],
   ["tomato", TomatoIcon],
-  ["cherry", CherryIcon],
+  ["cherry", Cherry],
   ["mushroom", MushroomIcon],
-  ["citrus", CitrusIcon],
-  ["leaf", LeafIcon],
-  ["flower", FlowerIcon],
-  ["leaf-small", LeafSmallIcon],
-  ["product", ProductIcon],
+  ["citrus", Citrus],
+  ["leaf", Leaf],
+  ["flower", Flower2],
+  ["leaf-small", Sprout],
+  ["product", Barcode],
 ];
 
 function avatarIconFor(key) {

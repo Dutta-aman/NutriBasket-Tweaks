@@ -1,21 +1,8 @@
 import { useState } from "react";
 
 import AppLayout from "../components/layout/AppLayout";
-import {
-  CheckIcon,
-  LeafIcon,
-  AppleIcon,
-  BroccoliIcon,
-  CarrotIcon,
-  BananaIcon,
-  TomatoIcon,
-  CherryIcon,
-  MushroomIcon,
-  CitrusIcon,
-  FlowerIcon,
-  LeafSmallIcon,
-  ProductIcon,
-} from "../components/icons";
+import { CheckIcon, LeafIcon, TomatoIcon, MushroomIcon } from "../components/icons";
+import { Apple, Broccoli, Carrot, Banana, Cherry, Citrus, Leaf, Flower2, Sprout, Barcode } from "lucide-react";
 
 import "./../styles/global.css";
 import "./../styles/profile.css";
@@ -54,18 +41,18 @@ const ACTIVITIES = [
 ];
 
 const AVATARS = [
-  ["apple", AppleIcon],
-  ["broccoli", BroccoliIcon],
-  ["carrot", CarrotIcon],
-  ["banana", BananaIcon],
+  ["apple", Apple],
+  ["broccoli", Broccoli],
+  ["carrot", Carrot],
+  ["banana", Banana],
   ["tomato", TomatoIcon],
-  ["cherry", CherryIcon],
+  ["cherry", Cherry],
   ["mushroom", MushroomIcon],
-  ["citrus", CitrusIcon],
-  ["leaf", LeafIcon],
-  ["flower", FlowerIcon],
-  ["leaf-small", LeafSmallIcon],
-  ["product", ProductIcon],
+  ["citrus", Citrus],
+  ["leaf", Leaf],
+  ["flower", Flower2],
+  ["leaf-small", Sprout],
+  ["product", Barcode],
 ];
 
 function cleanNumberInput(value, allowDecimal) {
