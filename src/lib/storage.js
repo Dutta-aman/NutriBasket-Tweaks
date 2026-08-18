@@ -1,7 +1,7 @@
 const memory = new Map();
 
 export const PROFILE_KEY = "nb_profile";
-export const PROFILE_VERSION = 1;
+export const PROFILE_VERSION = 2;
 
 export function storageGet(key) {
   let raw;

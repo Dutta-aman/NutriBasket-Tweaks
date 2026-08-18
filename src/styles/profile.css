@@ -135,65 +135,72 @@
   margin-top: 2px;
 }
 
-.profile-input-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.profile-field .manual-input {
+.profile-input-wrap {
+  position: relative;
   flex: 1;
-  max-width: none;
+  max-width: 240px;
 }
 
-.profile-field .manual-input:disabled {
-  background: var(--surface-muted);
-  color: var(--text-muted);
-  cursor: not-allowed;
+.profile-input-wrap .manual-input {
+  width: 100%;
 }
 
-.profile-unit {
-  flex: 0 0 auto;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-muted);
+.profile-input-wrap:has(.profile-unit-suffix) .manual-input {
+  padding-right: 46px;
+}
+
+.profile-unit-suffix {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  background: var(--emerald-50);
+  color: var(--emerald-700);
   font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.profile-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
+}
+
+.profile-segmented-option {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--emerald-700);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.profile-segmented-option.is-active {
+  background: var(--emerald-600);
+  color: #ffffff;
+}
+
+.profile-ftin-row {
+  display: flex;
+  gap: 10px;
 }
 
 .profile-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
-}
-
-.profile-check {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
-  cursor: pointer;
-}
-
-.profile-check input {
-  width: 17px;
-  height: 17px;
-  margin-top: 2px;
-  accent-color: var(--emerald-600);
-  cursor: pointer;
-}
-
-.profile-note {
-  margin-top: 12px;
-  padding: 12px 14px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--emerald-200);
-  background: var(--emerald-50);
-  color: var(--emerald-700);
-  font-size: 13.5px;
-  line-height: 1.5;
 }
 
 /* ================= Bubbles ================= */
@@ -363,7 +370,8 @@
 
 .profile-bubble-main:focus-visible,
 .profile-avatar:focus-visible,
-.profile-bubble-x:focus-visible {
+.profile-bubble-x:focus-visible,
+.profile-segmented-option:focus-visible {
   outline: 2px solid var(--emerald-700);
   outline-offset: 2px;
 }
