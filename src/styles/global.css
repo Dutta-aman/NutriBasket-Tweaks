@@ -1444,3 +1444,167 @@ body {
 .notfound-links a:hover {
   text-decoration: underline;
 }
+
+/* ================= Back-to-home button (#62) ================= */
+
+.back-btn {
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* ================= Profile skip block (#61) ================= */
+
+.profile-skip-block {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.profile-skip-block small {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* ================= Home setup prompt (#61) ================= */
+
+.home-setup-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--emerald-50);
+  border: 1px solid var(--emerald-200);
+}
+
+.home-setup-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 140px;
+}
+
+.home-setup-prompt-text strong {
+  color: var(--emerald-700);
+  font-size: 14px;
+}
+
+.home-setup-prompt-text span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.home-setup-btn {
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+.home-prompt-dismiss {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.home-prompt-dismiss:hover {
+  color: var(--primary);
+  background: var(--emerald-100);
+}
+
+/* ================= Recent scans (#63) ================= */
+
+.recent-scans {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-scans h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.scan-history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.scan-history-row:hover {
+  border-color: var(--emerald-300);
+  box-shadow: var(--shadow-card);
+}
+
+.scan-thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex: 0 0 auto;
+  background: var(--emerald-50);
+}
+
+.scan-thumb-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--emerald-600);
+}
+
+.scan-history-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.scan-history-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scan-history-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.scan-snapshot-chip {
+  flex: 0 1 auto;
+  max-width: 45%;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--emerald-100);
+  border: 1px solid var(--emerald-200);
+  color: var(--emerald-700);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

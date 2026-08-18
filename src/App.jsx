@@ -5,10 +5,34 @@ import Home from "./screens/Home";
 import ScanProduct from "./screens/ScanProduct";
 import ProductInfo from "./screens/ProductInfo";
 import Basket from "./screens/Basket";
+import Checkout from "./screens/Checkout";
+import PaymentSuccess from "./screens/PaymentSuccess";
 import { fetchProductByBarcode } from "./lib/api";
 import { extractBarcodeFromQr } from "./lib/barcode";
 import ProfileBoundary from "./components/ProfileBoundary";
-import { loadProfile, storageSet, storageRemove, PROFILE_KEY } from "./lib/storage";
+import { computeBMI, computeTargets, perceptionMessage } from "./lib/bmi";
+import { productRiskFlags } from "./lib/explainer";
+import { loadProfile, saveProfile, removeProfile, saveScanHistory } from "./lib/storage";
+import { activeAccount, signIn, signOut } from "./lib/account";
+
+function buildProfileSnapshot(profile, product) {
+  if (!profile) return null;
+  const bmi = computeBMI(profile.weightKg, profile.heightCm);
+  const flags = productRiskFlags(product);
+  const targets = computeTargets(profile);
+  const calories = Number(product.calories);
+  let budgetSummary = null;
+  if (targets && Number.isFinite(calories) && calories > 0) {
+    const share = Math.min(100, Math.round((calories / targets.calories) * 100));
+    budgetSummary = `${share}% of ${targets.calories} kcal daily budget`;
+  }
+  return {
+    bmi,
+    riskFlags: flags.map((flag) => flag.label),
+    perceptionMessage: perceptionMessage(profile, bmi),
+    budgetSummary,
+  };
+}
 
 function App() {
 
@@ -26,7 +50,9 @@ function App() {
 
   const [slowLookup, setSlowLookup] = useState(false);
 
-  const [profile, setProfile] = useState(() => loadProfile());
+  const [profile, setProfile] = useState(() => loadProfile(activeAccount()?.email));
+
+  const [account, setAccount] = useState(() => activeAccount());
 
   const lookupSeqRef = useRef(0);
 
@@ -88,6 +114,15 @@ function App() {
         setSelectedProduct(product);
 
         setLookup("ready");
+
+        saveScanHistory({
+          id: Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9),
+          barcode: product.barcode || barcode,
+          name: product.name || "Unknown product",
+          image: product.image_url || null,
+          timestamp: Date.now(),
+          profileSnapshot: buildProfileSnapshot(profile, product),
+        });
 
       })
 
@@ -168,7 +203,7 @@ function App() {
 
     setProfile(p);
 
-    storageSet(PROFILE_KEY, p);
+    saveProfile(p, account?.email);
 
     setPage("home");
 
@@ -176,11 +211,45 @@ function App() {
 
   function handleProfileReset() {
 
-    storageRemove(PROFILE_KEY);
+    removeProfile(account?.email);
 
     setProfile(null);
 
     setPage("welcome");
+
+  }
+
+  function handleGoogleSignIn(googleUser) {
+
+    const connected = signIn(googleUser);
+
+    setAccount(connected);
+
+    setProfile(loadProfile(connected.email));
+
+  }
+
+  function handleGoogleSignOut() {
+
+    signOut();
+
+    setAccount(null);
+
+    setProfile(loadProfile());
+
+  }
+
+  function handleExit() {
+
+    setBasket([]);
+
+    setSelectedProduct(null);
+
+    setLookup("idle");
+
+    setLastBarcode(null);
+
+    setPage("home");
 
   }
 
@@ -201,6 +270,10 @@ function App() {
       <ProfileBoundary
         onReset={handleProfileReset}
         onComplete={handleProfileComplete}
+        onSkip={() => setPage("home")}
+        activeAccount={account}
+        onSignIn={handleGoogleSignIn}
+        onSignOut={handleGoogleSignOut}
       />
     );
 
@@ -210,8 +283,11 @@ function App() {
 
     return (
       <Home
+        profile={profile}
         onScan={() => setPage("scan")}
         onBasket={() => setPage("basket")}
+        onSetupProfile={() => setPage("profile")}
+        onOpenScan={handleScanned}
       />
     );
 
@@ -324,6 +400,7 @@ function App() {
           product={selectedProduct}
           profile={profile}
           onBack={() => setPage("scan")}
+          onHome={() => setPage("home")}
           onAdd={addProduct}
         />
       );
@@ -343,6 +420,32 @@ function App() {
         updateQuantity={updateQuantity}
         profile={profile}
         onContinue={() => setPage("home")}
+        onHome={() => setPage("home")}
+        onCheckout={() => setPage("checkout")}
+      />
+    );
+
+  }
+
+  if (page === "checkout") {
+
+    return (
+      <Checkout
+        basket={basket}
+        onHome={() => setPage("home")}
+        onPayment={() => setPage("payment")}
+      />
+    );
+
+  }
+
+  if (page === "payment") {
+
+    return (
+      <PaymentSuccess
+        basket={basket}
+        onHome={() => setPage("home")}
+        onExit={handleExit}
       />
     );
 
