@@ -10,6 +10,7 @@ function Basket({
   updateQuantity,
   onCheckout,
   onContinue,
+  onHome,
   profile,
 }) {
 
@@ -60,12 +61,23 @@ function Basket({
 
             <p>Scan products to begin shopping.</p>
 
-            <button
-              className="start-btn"
-              onClick={onContinue}
-            >
-              🏠 Continue Shopping
-            </button>
+            <div className="basket-actions">
+
+              <button
+                className="secondary-btn"
+                onClick={onContinue}
+              >
+                🏠 Continue Shopping
+              </button>
+
+              <button
+                className="secondary-btn"
+                onClick={onHome}
+              >
+                ← Home
+              </button>
+
+            </div>
 
           </div>
 
@@ -188,6 +200,13 @@ function Basket({
                 onClick={onContinue}
               >
                 ← Continue Shopping
+              </button>
+
+              <button
+                className="secondary-btn"
+                onClick={onHome}
+              >
+                ← Home
               </button>
 
               <button

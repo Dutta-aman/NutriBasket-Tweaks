@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import AppLayout from "../components/layout/AppLayout";
+import AuthPanel from "../components/AuthPanel";
 import { CheckIcon, LeafIcon, TomatoIcon, MushroomIcon } from "../components/icons";
 import { Apple, Broccoli, Carrot, Banana, Cherry, Citrus, Leaf, Flower2, Sprout, Barcode } from "lucide-react";
 
@@ -114,7 +115,7 @@ function Bubble({ label, sub, selected, onSelect, onRemove }) {
   );
 }
 
-function Profile({ onComplete }) {
+function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -574,6 +575,42 @@ function Profile({ onComplete }) {
             >
               Continue
             </button>
+          </div>
+
+          {onSkip ? (
+            <div className="profile-skip-block">
+              <button
+                type="button"
+                className="secondary-btn profile-skip"
+                onClick={onSkip}
+              >
+                Skip for now
+              </button>
+              <small>I'll set it up later</small>
+            </div>
+          ) : null}
+
+          {onSkip ? (
+            <button
+              type="button"
+              className="secondary-btn back-btn"
+              onClick={onSkip}
+            >
+              ← Home
+            </button>
+          ) : null}
+
+          <div className="profile-section account-section">
+            <span className="profile-section-title">Account</span>
+            <p className="profile-hint">
+              Optional — connect a Google account to keep your profile tied to it on
+              this device.
+            </p>
+            <AuthPanel
+              activeAccount={activeAccount}
+              onSignIn={onSignIn}
+              onSignOut={onSignOut}
+            />
           </div>
       </div>
     </AppLayout>

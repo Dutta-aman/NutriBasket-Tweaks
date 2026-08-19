@@ -36,8 +36,8 @@ class ProfileBoundary extends Component {
       );
     }
 
-    const { onComplete, ...rest } = this.props;
-    return <Profile onComplete={onComplete} {...rest} />;
+    const { onComplete, onSkip, ...rest } = this.props;
+    return <Profile onComplete={onComplete} onSkip={onSkip} {...rest} />;
   }
 }
 

@@ -6,7 +6,8 @@ function ProductInfo({
   product,
   profile,
   onAdd,
-  onBack
+  onBack,
+  onHome
 }) {
 
   function fmt(value, suffix) {
@@ -128,6 +129,18 @@ function ProductInfo({
           >
 
             ← Back
+
+          </button>
+
+          <button
+
+            className="secondary-btn"
+
+            onClick={onHome}
+
+          >
+
+            ← Home
 
           </button>
 
