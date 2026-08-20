@@ -6,7 +6,7 @@ function round2(n) { return Math.round(n * 100) / 100; }
 function Checkout({
   basket,
   onPayment,
-  onHome
+  onBack
 }) {
 
   const totalItems = basket.reduce(
@@ -108,9 +108,9 @@ function Checkout({
 
         <button
           className="secondary-btn back-btn"
-          onClick={onHome}
+          onClick={onBack}
         >
-          ← Home
+          ← Back
         </button>
 
       </div>
