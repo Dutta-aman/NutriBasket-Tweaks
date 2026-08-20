@@ -15,6 +15,9 @@ A final-year student project: point your phone camera at any packaged product, a
 - **Basket** — quantity controls, remove items, per-item nutrition, running totals for calories, protein, carbs, and fat, plus the total bill
 - **Checkout (demo payment flow)** — order summary with a simulated UPI payment screen
 - **Payment success receipt** — receipt page with a generated transaction ID
+- **Personal profile (BMI personalization)** — an optional profile (name, age, height in cm or feet/inches, weight, activity) that unlocks ICMR-target-based daily calorie goals, a Personal Fit card on every product, a per-basket calorie budget bar, and per-product risk chips (high salt/sugar/saturated fat) with plain-language health messaging. Setup can be skipped; a prompt on Home re-offers it
+- **Scan history** — every scan is stored locally (capped at 50, deduplicated) with or without a profile; when a profile exists each entry also snapshots that scan's personal recommendations, and Home shows a Recent scans list that can reopen products
+- **Optional Google account** — connect a Google account to store the profile against that account instead of the shared local slot; an existing local profile is copied over on first connect (activates once `VITE_GOOGLE_CLIENT_ID` is set)
 - **Seeded offline lookup + live fallback** — 500 popular Indian products are served from a bundled SQLite seed (no network call); anything else falls back to the Open Food Facts India database
 - **Rate limiting** — the product API allows 60 requests per minute per IP
 
@@ -61,11 +64,12 @@ There are three ways to reach a product page:
 
 ## Screens
 
-- **Welcome** — landing card with a Get Started button that enters the app
-- **Home** — dashboard with an Active Shopping Session indicator and two actions: Scan Product and My Basket
+- **Welcome** — landing card with a Get Started button; a profile avatar circle sits top-right once a profile exists
+- **Home** — dashboard with an Active Shopping Session indicator, two actions (Scan Product and My Basket), a Recent scans list (reopens past products, shows each scan's saved recommendation when a profile exists), and a "Set up your profile" prompt for first-time users
+- **Profile** — multi-step setup form (name, age, weight, height with a cm ↔ ft/in toggle, activity level, food-themed avatar) plus an optional Account section to connect a Google account; the form can be skipped
 - **Scanner** — live camera feed with a manual barcode entry fallback (see Scanning Flows)
-- **Product** — product photo, nutrition grid with calories, protein, carbs, and fat set in the Playfair Display font, and Add to Basket. While the lookup runs, a dither-grain animation plays; after ~5 seconds a hint appears for cold starts ("Waking up the server — this is normal for the free-tier backend…"). Unknown codes show the Product Not Found screen
-- **Basket** — quantity controls, remove items, per-item nutrition, running totals for calories, protein, carbs, and fat, and the total bill
+- **Product** — product photo, nutrition grid with calories, protein, carbs, and fat set in the Playfair Display font, Add to Basket, a Personal Fit card and risk chips when a profile exists, and a "← Home" back button. While the lookup runs, a dither-grain animation plays; after ~5 seconds a hint appears for cold starts ("Waking up the server — this is normal for the free-tier backend…"). Unknown codes show the Product Not Found screen
+- **Basket** — quantity controls, remove items, per-item nutrition, running totals for calories, protein, carbs, and fat, the total bill, and a calorie budget bar when a profile exists
 - **Checkout** — order summary with a simulated UPI payment screen
 - **Payment receipt** — receipt with a generated transaction ID
 
@@ -144,6 +148,7 @@ Note: the camera (`getUserMedia`) requires a secure context — `https://` or `h
 | `PORT` | Backend (Render) | Server port, default `3001` |
 | `SEED_FILE` | Backend (Render, optional) | Path to the SQLite seed; defaults to `seed/demo.db` |
 | `OFF_BASE_URL` | Backend (Render, optional) | Open Food Facts API base; defaults to `https://in.openfoodfacts.org` |
+| `VITE_GOOGLE_CLIENT_ID` | Frontend (optional) | Google OAuth client ID; enables the optional account connection in the profile page (disabled with a hint until set) |
 
 ## API
 
@@ -201,10 +206,13 @@ python3 scripts/make_csv_seed.py en.openfoodfacts.org.products.csv.gz 500 seed/d
 ```
 NutriBasket_Tweaks/
 ├── src/                      # React frontend (Vite)
-│   ├── App.jsx               # screen routing, scan flow, basket state
-│   ├── components/           # BarcodeScanner (ZXing), ErrorBoundary, layout
-│   ├── lib/                  # api.js (fetch client), barcode.js (GTIN check, QR parsing)
-│   ├── screens/              # Welcome, Home, ScanProduct, ProductInfo, Basket, ...
+│   ├── App.jsx               # screen routing, scan flow, basket state, profile/account state
+│   ├── components/           # BarcodeScanner (ZXing), PersonalFitCard, RiskChips, BasketBudgetBar,
+│   │                         # ProfileBoundary, AuthPanel (Google), layout, icons
+│   ├── lib/                  # api.js (fetch client), barcode.js (GTIN check, QR parsing),
+│   │                         # bmi.js (ICMR targets), explainer.js (risk/health messaging),
+│   │                         # storage.js (profile, scan history), account.js (Google accounts)
+│   ├── screens/              # Welcome, Home, Profile, ScanProduct, ProductInfo, Basket, ...
 │   └── styles/               # plain CSS, emerald theme
 ├── server/                   # Express backend
 │   ├── index.js              # routes, rate limiting, GTIN validation
@@ -235,10 +243,10 @@ Nutrition data comes from **Open Food Facts**, © Open Food Facts contributors, 
 
 - **Seed coverage** — the demo seed holds 500 products; the full Indian catalogue on Open Food Facts is ~22,000 products, of which only ~1,800 have complete nutrition data. Shipping the full nutrition-complete set as a second seed is planned.
 - **Cold starts** — Render's free tier sleeps after ~15 minutes of inactivity; the first request after an idle period can take ~30 seconds to wake the service.
-- **No accounts** — baskets live only in the current browser session; there are no users and no persistence.
+- **No accounts (optional)** — baskets live only in the current browser session; profile sync to a Google account is optional and disabled until `VITE_GOOGLE_CLIENT_ID` is configured.
 - **Demo payments** — checkout shows a simulated UPI screen and a generated transaction ID; no real money moves.
 - **Barcode deep-links** — plain EAN-13 barcodes cannot open the app from a stock camera; only QR codes deep-link (see Scanning Flows).
-- **Roadmap ideas** — full India seed, automated tests, basket/scan-history persistence, real payment integration, AI-based nutrition guidance.
+- **Roadmap ideas** — full India seed, automated tests, basket persistence, real payment integration, AI-based nutrition guidance.
 
 ## Credits
 
