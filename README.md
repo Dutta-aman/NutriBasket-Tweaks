@@ -1,4 +1,4 @@
-![NutriBasket Banner](assets/banner.svg)
+![NutriBasket Banner](assets/banner.gif)
 
 # NutriBasket
 
