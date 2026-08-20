@@ -115,7 +115,7 @@ function Bubble({ label, sub, selected, onSelect, onRemove }) {
   );
 }
 
-function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut }) {
+function Profile({ onComplete, onSkip, onBack, activeAccount, onSignIn, onSignOut }) {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -590,13 +590,13 @@ function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut }) {
             </div>
           ) : null}
 
-          {onSkip ? (
+          {onBack ? (
             <button
               type="button"
               className="secondary-btn back-btn"
-              onClick={onSkip}
+              onClick={onBack}
             >
-              ← Home
+              ← Back
             </button>
           ) : null}
 

@@ -11,6 +11,7 @@ function Basket({
   onCheckout,
   onContinue,
   onHome,
+  onBack,
   profile,
 }) {
 
@@ -62,6 +63,13 @@ function Basket({
             <p>Scan products to begin shopping.</p>
 
             <div className="basket-actions">
+
+              <button
+                className="secondary-btn"
+                onClick={onBack}
+              >
+                ← Back
+              </button>
 
               <button
                 className="secondary-btn"
@@ -194,6 +202,13 @@ function Basket({
             <BasketBudgetBar basket={basket} profile={profile} />
 
             <div className="basket-actions">
+
+              <button
+                className="secondary-btn"
+                onClick={onBack}
+              >
+                ← Back
+              </button>
 
               <button
                 className="secondary-btn"

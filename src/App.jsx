@@ -36,9 +36,19 @@ function buildProfileSnapshot(profile, product) {
 
 function App() {
 
-  const [page, setPage] = useState("welcome");
+  const [page, setPage] = useState(() => {
+    const saved = sessionStorage.getItem("nb_page");
+    return saved === "product" ? "home" : saved || "welcome";
+  });
 
-  const [basket, setBasket] = useState([]);
+  const [basket, setBasket] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem("nb_basket");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const [selectedProduct, setSelectedProduct] = useState(null);
 
@@ -56,12 +66,40 @@ function App() {
 
   const lookupSeqRef = useRef(0);
 
+  const pageRef = useRef(page);
+
+  const historyRef = useRef([]);
+
+  function navigate(next) {
+    if (pageRef.current === next) return;
+    const stack = historyRef.current;
+    if (stack[stack.length - 1] !== pageRef.current) stack.push(pageRef.current);
+    pageRef.current = next;
+    setPage(next);
+  }
+
+  function goBack() {
+    const stack = historyRef.current;
+    const target = stack.pop() ?? "home";
+    pageRef.current = target;
+    setPage(target);
+  }
+
+  function cancelLookup() {
+    lookupSeqRef.current += 1;
+    setLookup("idle");
+    setSelectedProduct(null);
+    goBack();
+  }
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("product") ?? params.get("barcode") ?? params.get("code") ?? params.get("gtin") ?? params.get("ean") ?? params.get("id");
     const pathMatch = window.location.pathname.match(/^\/(\d{8,14})$/);
     const barcode = (raw ? extractBarcodeFromQr(raw) : null) ?? (pathMatch ? extractBarcodeFromQr(pathMatch[1]) : null);
     if (barcode) {
+      historyRef.current = [];
+      if (pageRef.current === "welcome") pageRef.current = "home";
       handleScanned(barcode);
       const url = new URL(window.location.href);
       for (const key of ["product", "barcode", "code", "gtin", "ean", "id"]) {
@@ -71,6 +109,14 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("nb_page", page);
+  }, [page]);
+
+  useEffect(() => {
+    sessionStorage.setItem("nb_basket", JSON.stringify(basket));
+  }, [basket]);
 
   useEffect(() => {
 
@@ -93,7 +139,7 @@ function App() {
 
     setLookup("loading");
 
-    setPage("product");
+    navigate("product");
 
     const seq = ++lookupSeqRef.current;
 
@@ -173,7 +219,7 @@ function App() {
 
     }
 
-    setPage("basket");
+    navigate("basket");
 
   }
 
@@ -205,7 +251,7 @@ function App() {
 
     saveProfile(p, account?.email);
 
-    setPage("home");
+    navigate("home");
 
   }
 
@@ -215,7 +261,7 @@ function App() {
 
     setProfile(null);
 
-    setPage("welcome");
+    navigate("welcome");
 
   }
 
@@ -249,7 +295,7 @@ function App() {
 
     setLastBarcode(null);
 
-    setPage("home");
+    navigate("home");
 
   }
 
@@ -258,7 +304,7 @@ function App() {
     return (
       <Welcome
         profile={profile}
-        onStart={() => setPage(profile ? "home" : "profile")}
+        onStart={() => navigate(profile ? "home" : "profile")}
       />
     );
 
@@ -270,7 +316,8 @@ function App() {
       <ProfileBoundary
         onReset={handleProfileReset}
         onComplete={handleProfileComplete}
-        onSkip={() => setPage("home")}
+        onSkip={() => navigate("home")}
+        onBack={goBack}
         activeAccount={account}
         onSignIn={handleGoogleSignIn}
         onSignOut={handleGoogleSignOut}
@@ -284,9 +331,9 @@ function App() {
     return (
       <Home
         profile={profile}
-        onScan={() => setPage("scan")}
-        onBasket={() => setPage("basket")}
-        onSetupProfile={() => setPage("profile")}
+        onScan={() => navigate("scan")}
+        onBasket={() => navigate("basket")}
+        onSetupProfile={() => navigate("profile")}
         onOpenScan={handleScanned}
       />
     );
@@ -298,7 +345,7 @@ function App() {
     return (
       <ScanProduct
         onProduct={handleScanned}
-        onBack={() => setPage("welcome")}
+        onBack={goBack}
       />
     );
 
@@ -321,6 +368,14 @@ function App() {
                 Please wait…
               </p>
             )}
+            <div className="product-buttons">
+              <button
+                className="secondary-btn"
+                onClick={cancelLookup}
+              >
+                ← Back
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -352,12 +407,20 @@ function App() {
                 </a>
               </div>
             )}
-            <button
-              className="start-btn premium-btn"
-              onClick={() => setPage("scan")}
-            >
-              ← Try Another
-            </button>
+            <div className="product-buttons">
+              <button
+                className="secondary-btn"
+                onClick={goBack}
+              >
+                ← Back
+              </button>
+              <button
+                className="start-btn premium-btn"
+                onClick={() => navigate("scan")}
+              >
+                ← Try Another
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -374,7 +437,7 @@ function App() {
             <div className="product-buttons">
               <button
                 className="secondary-btn"
-                onClick={() => setPage("scan")}
+                onClick={goBack}
               >
                 ← Back
               </button>
@@ -399,8 +462,8 @@ function App() {
         <ProductInfo
           product={selectedProduct}
           profile={profile}
-          onBack={() => setPage("scan")}
-          onHome={() => setPage("home")}
+          onBack={goBack}
+          onHome={() => navigate("home")}
           onAdd={addProduct}
         />
       );
@@ -419,9 +482,10 @@ function App() {
         setBasket={setBasket}
         updateQuantity={updateQuantity}
         profile={profile}
-        onContinue={() => setPage("home")}
-        onHome={() => setPage("home")}
-        onCheckout={() => setPage("checkout")}
+        onBack={goBack}
+        onContinue={() => navigate("home")}
+        onHome={() => navigate("home")}
+        onCheckout={() => navigate("checkout")}
       />
     );
 
@@ -432,8 +496,8 @@ function App() {
     return (
       <Checkout
         basket={basket}
-        onHome={() => setPage("home")}
-        onPayment={() => setPage("payment")}
+        onBack={goBack}
+        onPayment={() => navigate("payment")}
       />
     );
 
@@ -444,7 +508,7 @@ function App() {
     return (
       <PaymentSuccess
         basket={basket}
-        onHome={() => setPage("home")}
+        onBack={goBack}
         onExit={handleExit}
       />
     );
