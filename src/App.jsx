@@ -12,7 +12,7 @@ import { extractBarcodeFromQr } from "./lib/barcode";
 import ProfileBoundary from "./components/ProfileBoundary";
 import { computeBMI, computeTargets, perceptionMessage } from "./lib/bmi";
 import { productRiskFlags } from "./lib/explainer";
-import { loadProfile, saveProfile, removeProfile, saveScanHistory } from "./lib/storage";
+import { loadProfile, saveProfile, removeProfile, saveScanHistory, clearScanHistory } from "./lib/storage";
 import { activeAccount, signIn, signOut } from "./lib/account";
 
 function buildProfileSnapshot(profile, product) {
@@ -213,9 +213,21 @@ function App() {
 
     removeProfile(account?.email);
 
+    clearScanHistory();
+
+    signOut();
+
     setProfile(null);
 
+    setAccount(null);
+
     setPage("welcome");
+
+  }
+
+  function handleEditProfile() {
+
+    setPage("profile");
 
   }
 
@@ -274,6 +286,7 @@ function App() {
         activeAccount={account}
         onSignIn={handleGoogleSignIn}
         onSignOut={handleGoogleSignOut}
+        initialProfile={profile}
       />
     );
 
@@ -288,6 +301,8 @@ function App() {
         onBasket={() => setPage("basket")}
         onSetupProfile={() => setPage("profile")}
         onOpenScan={handleScanned}
+        onEditProfile={handleEditProfile}
+        onResetProfile={handleProfileReset}
       />
     );
 

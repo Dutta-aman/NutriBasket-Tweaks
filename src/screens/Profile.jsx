@@ -4,6 +4,7 @@ import AppLayout from "../components/layout/AppLayout";
 import AuthPanel from "../components/AuthPanel";
 import { CheckIcon, LeafIcon, TomatoIcon, MushroomIcon } from "../components/icons";
 import { Apple, Broccoli, Carrot, Banana, Cherry, Citrus, Leaf, Flower2, Sprout, Barcode } from "lucide-react";
+import { PROFILE_VERSION } from "../lib/storage";
 
 import "./../styles/global.css";
 import "./../styles/profile.css";
@@ -115,20 +116,21 @@ function Bubble({ label, sub, selected, onSelect, onRemove }) {
   );
 }
 
-function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut }) {
+function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut, initialProfile }) {
+  const existing = initialProfile && typeof initialProfile === "object" ? initialProfile : null;
   const [step, setStep] = useState(1);
-  const [name, setName] = useState("");
-  const [age, setAge] = useState("");
-  const [weight, setWeight] = useState("");
-  const [height, setHeight] = useState("");
+  const [name, setName] = useState(existing?.name || "");
+  const [age, setAge] = useState(existing?.age != null ? String(existing.age) : "");
+  const [weight, setWeight] = useState(existing?.weightKg != null ? String(existing.weightKg) : "");
+  const [height, setHeight] = useState(existing?.heightCm != null ? String(existing.heightCm) : "");
   const [heightUnit, setHeightUnit] = useState("cm");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
-  const [gender, setGender] = useState(null);
-  const [perception, setPerception] = useState([]);
-  const [goal, setGoal] = useState([]);
-  const [activity, setActivity] = useState(null);
-  const [avatar, setAvatar] = useState("");
+  const [gender, setGender] = useState(existing?.gender || null);
+  const [perception, setPerception] = useState(Array.isArray(existing?.perception) ? existing.perception : []);
+  const [goal, setGoal] = useState(Array.isArray(existing?.goal) ? existing.goal : []);
+  const [activity, setActivity] = useState(existing?.activity || null);
+  const [avatar, setAvatar] = useState(existing?.avatar || "");
   const [touched, setTouched] = useState({});
 
   const ageNum = parseNumber(age);
@@ -250,7 +252,7 @@ function Profile({ onComplete, onSkip, activeAccount, onSignIn, onSignOut }) {
     if (!onComplete) return;
     const heightCm = heightValid ? heightNum : null;
     onComplete({
-      version: 2,
+      version: PROFILE_VERSION,
       name: name.trim(),
       age: ageValid ? ageNum : null,
       weightKg: weightValid ? weightNum : null,
