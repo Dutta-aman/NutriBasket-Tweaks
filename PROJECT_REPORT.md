@@ -84,7 +84,7 @@ The project was verified end-to-end against live barcodes: a real product return
 
 | Figure | Title | Source |
 | --- | --- | --- |
-| Fig. 1.1 | NutriBasket banner | `assets/banner.svg` |
+| Fig. 1.1 | NutriBasket banner | `assets/banner.gif` |
 | Fig. 4.1 | System architecture (frontend, backend, OFF, deployments) | §4.1 (fig-4-1.jpg) |
 | Fig. 4.2 | Frontend component tree | §4.2 (fig-4-2.jpg) |
 | Fig. 4.3 | User workflow with fallback paths | §4.2 (fig-4-3.jpg) |
