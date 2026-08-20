@@ -395,6 +395,18 @@ button {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.45);
 }
 
+.home-reset-profile {
+  margin-left: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--danger, #dc2626);
+  font-size: 12px;
+  text-decoration: underline;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
 .profile-avatar-circle svg {
   width: 22px;
   height: 22px;

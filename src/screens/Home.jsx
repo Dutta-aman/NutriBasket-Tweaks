@@ -44,7 +44,9 @@ function Home({
   onScan,
   onBasket,
   onSetupProfile,
-  onOpenScan
+  onOpenScan,
+  onEditProfile,
+  onResetProfile
 }) {
 
   const [setupPromptVisible, setSetupPromptVisible] = useState(true);
@@ -58,10 +60,12 @@ function Home({
     <div className="home-container">
 
       {profile && (
-        <div
+        <button
+          type="button"
           className="profile-avatar-circle"
-          role="img"
-          aria-label={profile.name ? `${profile.name} profile` : "Profile"}
+          aria-label="Edit profile"
+          title="Edit profile"
+          onClick={onEditProfile}
         >
           {AvatarIcon ? (
             <AvatarIcon />
@@ -70,7 +74,7 @@ function Home({
               {profile.name ? profile.name.charAt(0) : "?"}
             </span>
           )}
-        </div>
+        </button>
       )}
 
       <div className="home-card premium-home dither-overlay">
@@ -175,6 +179,19 @@ function Home({
 
         <div className="home-footer">
           Nutrition data © Open Food Facts contributors, licensed under ODbL 1.0
+          {profile && onResetProfile && (
+            <button
+              type="button"
+              className="home-reset-profile"
+              onClick={() => {
+                if (window.confirm("Reset your nutrition profile? This clears your data and recent scans.")) {
+                  onResetProfile();
+                }
+              }}
+            >
+              Reset profile
+            </button>
+          )}
         </div>
 
         <div className="home-buttons premium-buttons">

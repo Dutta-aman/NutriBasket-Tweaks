@@ -54,22 +54,45 @@ export function profileKeyFor(email) {
   return key ? `${PROFILE_KEY}:${key}` : PROFILE_KEY;
 }
 
+export function migrateProfile(profile) {
+  if (profile == null || typeof profile !== "object") return null;
+  if (profile.version === PROFILE_VERSION) return profile;
+  const defaults = {
+    version: PROFILE_VERSION,
+    name: "",
+    age: null,
+    weightKg: null,
+    heightCm: null,
+    gender: null,
+    perception: [],
+    goal: [],
+    activity: null,
+    avatar: "",
+  };
+  const migrated = { ...defaults, ...profile, version: PROFILE_VERSION };
+  if (!Array.isArray(migrated.perception)) migrated.perception = [];
+  if (!Array.isArray(migrated.goal)) migrated.goal = [];
+  return migrated;
+}
+
 export function loadProfile(email) {
   const key = profileKeyFor(email);
   const profile = storageGet(key);
   if (profile != null) {
     if (profile.version === PROFILE_VERSION) return profile;
-    storageRemove(key);
+    const migrated = migrateProfile(profile);
+    storageSet(key, migrated);
+    return migrated;
   }
   if (key !== PROFILE_KEY) {
     // First connect for this account: keep the legacy local profile and
     // seed the account profile from it so nothing is lost.
     const legacy = storageGet(PROFILE_KEY);
-    if (legacy != null && legacy.version === PROFILE_VERSION) {
-      storageSet(key, legacy);
-      return legacy;
+    if (legacy != null) {
+      const migrated = migrateProfile(legacy);
+      storageSet(key, migrated);
+      return migrated;
     }
-    if (legacy != null) storageRemove(PROFILE_KEY);
   }
   return null;
 }
@@ -81,6 +104,10 @@ export function saveProfile(profile, email) {
 
 export function removeProfile(email) {
   storageRemove(profileKeyFor(email));
+}
+
+export function clearScanHistory() {
+  storageRemove(SCAN_HISTORY_KEY);
 }
 
 export function loadScanHistory() {
