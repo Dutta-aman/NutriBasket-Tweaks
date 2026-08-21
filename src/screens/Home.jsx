@@ -3,6 +3,7 @@ import "./../styles/global.css";
 import { LeafIcon, TomatoIcon, MushroomIcon } from "../components/icons";
 import { Apple, Broccoli, Carrot, Banana, Cherry, Citrus, Leaf, Flower2, Sprout, Barcode } from "lucide-react";
 import { loadScanHistory } from "../lib/storage";
+import AuthPanel from "../components/AuthPanel";
 
 const AVATARS = [
   ["apple", Apple],
@@ -44,7 +45,11 @@ function Home({
   onScan,
   onBasket,
   onSetupProfile,
-  onOpenScan
+  onOpenScan,
+  activeAccount,
+  onSignIn,
+  onSignOut,
+  onDisconnect
 }) {
 
   const [setupPromptVisible, setSetupPromptVisible] = useState(true);
@@ -96,6 +101,17 @@ function Home({
 
 
         </div>
+
+        {profile && (
+          <div className="home-account-section">
+            <AuthPanel
+              activeAccount={activeAccount}
+              onSignIn={onSignIn}
+              onSignOut={onSignOut}
+              onDisconnect={onDisconnect}
+            />
+          </div>
+        )}
 
         {profile == null && setupPromptVisible && (
           <div className="home-setup-prompt">

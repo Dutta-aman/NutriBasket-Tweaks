@@ -40,11 +40,12 @@ const BUTTON_STYLES = {
   text: "signin_with",
 };
 
-export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
+export default function AuthPanel({ activeAccount, onSignIn, onSignOut, onDisconnect }) {
   const buttonRef = useRef(null);
   const onSignInRef = useRef(onSignIn);
   const [gisReady, setGisReady] = useState(false);
   const [gisFailed, setGisFailed] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
     onSignInRef.current = onSignIn;
@@ -59,6 +60,17 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
         window.google.accounts.id.initialize({
           client_id: CLIENT_ID,
           callback: (response) => {
+            if (response && response.error) {
+              const msg =
+                response.error === "user_canceled"
+                  ? "Sign-in was cancelled."
+                  : response.error === "popup_closed_by_user"
+                    ? "Sign-in popup was closed."
+                    : "Google sign-in failed. Try again.";
+              setAuthError(msg);
+              return;
+            }
+            setAuthError(null);
             const payload = decodeJwtPayload(response && response.credential);
             if (payload && payload.email) {
               onSignInRef.current({
@@ -131,6 +143,19 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
         <button type="button" className="secondary-btn account-signout" onClick={onSignOut}>
           Sign out
         </button>
+        {onDisconnect && (
+          <button
+            type="button"
+            className="secondary-btn account-disconnect"
+            onClick={() => {
+              if (window.confirm("Remove this Google account from this device? Your profile data stays.")) {
+                onDisconnect();
+              }
+            }}
+          >
+            Disconnect
+          </button>
+        )}
       </div>
     );
   }
@@ -160,6 +185,11 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
             </p>
           ) : null}
         </>
+      )}
+      {authError && (
+        <p className="account-note" style={{ fontSize: 13, color: "var(--danger, #dc2626)", margin: "8px 0 0" }}>
+          {authError}
+        </p>
       )}
     </div>
   );
