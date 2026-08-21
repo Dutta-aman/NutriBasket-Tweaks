@@ -13,7 +13,7 @@ import ProfileBoundary from "./components/ProfileBoundary";
 import { computeBMI, computeTargets, perceptionMessage } from "./lib/bmi";
 import { productRiskFlags } from "./lib/explainer";
 import { loadProfile, saveProfile, removeProfile, saveScanHistory } from "./lib/storage";
-import { activeAccount, signIn, signOut } from "./lib/account";
+import { activeAccount, signIn, signOut, removeAccount } from "./lib/account";
 
 function buildProfileSnapshot(profile, product) {
   if (!profile) return null;
@@ -239,6 +239,18 @@ function App() {
 
   }
 
+  function handleDisconnect() {
+
+    const email = account?.email;
+
+    removeAccount(email);
+
+    setAccount(null);
+
+    setProfile(loadProfile());
+
+  }
+
   function handleExit() {
 
     setBasket([]);
@@ -288,6 +300,10 @@ function App() {
         onBasket={() => setPage("basket")}
         onSetupProfile={() => setPage("profile")}
         onOpenScan={handleScanned}
+        activeAccount={account}
+        onSignIn={handleGoogleSignIn}
+        onSignOut={handleGoogleSignOut}
+        onDisconnect={handleDisconnect}
       />
     );
 

@@ -52,6 +52,15 @@ export function signOut() {
   saveAccountStore({ ...store, activeEmail: null });
 }
 
+export function removeAccount(email) {
+  const key = accountKey(email);
+  const store = getAccountStore();
+  const accounts = store.accounts.filter((a) => accountKey(a.email) !== key);
+  const activeEmail =
+    store.activeEmail === key ? null : store.activeEmail;
+  saveAccountStore({ accounts, activeEmail });
+}
+
 export function activeAccount() {
   const store = getAccountStore();
   if (!store.activeEmail) return null;
