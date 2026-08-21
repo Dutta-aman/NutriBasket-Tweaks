@@ -2,15 +2,19 @@ import { useEffect, useRef, useState } from "react";
 
 const GIS_SCRIPT_URL = "https://accounts.google.com/gsi/client";
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
-function decodeJwtPayload(token) {
-  try {
-    const base64 = String(token).split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
-    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-    return JSON.parse(atob(padded));
-  } catch {
-    return null;
+async function verifyGoogleToken(credential) {
+  const res = await fetch(`${API_BASE}/api/auth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ credential }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message || `Verification failed (${res.status})`);
   }
+  return res.json();
 }
 
 function loadGisScript() {
@@ -45,6 +49,7 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
   const onSignInRef = useRef(onSignIn);
   const [gisReady, setGisReady] = useState(false);
   const [gisFailed, setGisFailed] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   useEffect(() => {
     onSignInRef.current = onSignIn;
@@ -59,15 +64,26 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
         window.google.accounts.id.initialize({
           client_id: CLIENT_ID,
           callback: (response) => {
-            const payload = decodeJwtPayload(response && response.credential);
-            if (payload && payload.email) {
-              onSignInRef.current({
-                googleId: payload.sub,
-                name: payload.name,
-                email: payload.email,
-                picture: payload.picture,
-              });
+            if (response && response.error) {
+              const msg =
+                response.error === "user_canceled"
+                  ? "Sign-in was cancelled."
+                  : response.error === "popup_closed_by_user"
+                    ? "Sign-in popup was closed."
+                    : "Google sign-in failed. Try again.";
+              setAuthError(msg);
+              return;
             }
+            setAuthError(null);
+            const credential = response && response.credential;
+            if (!credential) return;
+            verifyGoogleToken(credential)
+              .then((data) => {
+                if (data && data.user) onSignInRef.current(data.user);
+              })
+              .catch((err) => {
+                setAuthError(err.message || "Could not verify Google sign-in.");
+              });
           },
         });
         setGisReady(true);
@@ -160,6 +176,11 @@ export default function AuthPanel({ activeAccount, onSignIn, onSignOut }) {
             </p>
           ) : null}
         </>
+      )}
+      {authError && (
+        <p className="account-note" style={{ fontSize: 13, color: "var(--danger, #dc2626)", margin: "8px 0 0" }}>
+          {authError}
+        </p>
       )}
     </div>
   );

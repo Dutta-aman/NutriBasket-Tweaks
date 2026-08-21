@@ -7,6 +7,8 @@ import { findInSeed } from "./lib/seed.js";
 
 const app = express();
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
+
 const allowedOrigins = (process.env.CLIENT_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
@@ -56,6 +58,38 @@ app.get("/", (req, res) => {
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
+});
+
+app.post("/api/auth/google", express.json(), rateLimit(30), async (req, res) => {
+  const { credential } = req.body;
+  if (!credential || typeof credential !== "string") {
+    return res.status(400).json({ error: "missing_credential", message: "Google ID token is required" });
+  }
+
+  try {
+    const verifyUrl = `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`;
+    const googleRes = await fetch(verifyUrl);
+    if (!googleRes.ok) {
+      return res.status(401).json({ error: "invalid_token", message: "Google token verification failed" });
+    }
+    const payload = await googleRes.json();
+
+    if (GOOGLE_CLIENT_ID && payload.aud !== GOOGLE_CLIENT_ID) {
+      return res.status(401).json({ error: "wrong_audience", message: "Token was not issued for this app" });
+    }
+
+    res.json({
+      user: {
+        googleId: payload.sub,
+        name: payload.name,
+        email: payload.email,
+        picture: payload.picture,
+      },
+    });
+  } catch (err) {
+    console.error("Google auth verification failed:", err.message);
+    res.status(502).json({ error: "verification_failed", message: "Could not verify Google token" });
+  }
 });
 
 app.use("/api/products", rateLimit(60));
